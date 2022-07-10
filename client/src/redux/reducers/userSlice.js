@@ -4,6 +4,7 @@ const userSlice = createSlice({
   initialState: {
     value: {
       name: "Arb",
+      auth: false,
     },
   },
   reducers: {

@@ -3,19 +3,21 @@ import { useDispatch } from "react-redux";
 import useTheme from "../hooks/useTheme";
 import { switchTheme } from "../redux/reducers/themeSlice";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 import useUser from "../hooks/useUser";
 
 export default function HomeScreen() {
   const dispatcher = useDispatch();
   const themeData = useTheme();
   const navigate = useNavigate();
+  const auth = useAuth();
   const user = useUser();
   useEffect(() => {
-    if (!user) navigate("/login");
+    if (!auth) navigate("/login");
     else navigate("/dashboard");
-  }, [navigate, user]);
+  }, [navigate, auth]);
   return (
-    user && (
+    auth && (
       <>
         <div>
           <h1 style={{ color: themeData.color }}>
