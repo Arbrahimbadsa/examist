@@ -31,7 +31,8 @@ const themeSlice = createSlice({
     updateTheme: (state) => {
       if (localStorage) {
         const mode = localStorage.getItem("themeMode");
-        state.value = mode;
+        if (mode) state.value = mode;
+        else state.value = "light";
       } else {
         state.value = "light";
       }

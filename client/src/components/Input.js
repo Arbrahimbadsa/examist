@@ -27,10 +27,10 @@ export default function Input({ label, ...rest }) {
   const theme = useTheme();
   return (
     <InputHolder>
-      <Label theme={theme} for={"examist-" + rest.id}>
+      <Label theme={theme} htmlFor={"flame-" + rest.id}>
         {label}
       </Label>
-      <StyledInput {...rest} id={"examist-" + rest.id} />
+      <StyledInput {...rest} id={"flame-" + rest.id} />
     </InputHolder>
   );
 }

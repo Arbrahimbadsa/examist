@@ -9,6 +9,7 @@ const StyledButton = styled.button`
   background: ${(props) => props.theme.loginPage.bg};
   color: #fff;
   margin-bottom: 10px;
+  display: block;
 `;
 export default function Button({ children, ...rest }) {
   const theme = useTheme();

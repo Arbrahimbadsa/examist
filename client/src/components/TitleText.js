@@ -5,6 +5,9 @@ const Title = styled.h1`
   font-weight: 500;
   font-size: 25px;
   color: ${(props) => props.theme.loginPage.text};
+  @media only screen and (max-width: 600px) {
+    margin-top: 10px;
+  }
 `;
 export default function TitleText({ children, topMargin }) {
   const theme = useTheme();
