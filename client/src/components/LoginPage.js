@@ -13,12 +13,13 @@ import { setUser } from "../redux/reducers/userSlice";
 import { updateUser } from "../redux/reducers/userSlice";
 import { updateTheme } from "../redux/reducers/themeSlice";
 import Logo from "./Logo";
+import { object, string } from "yup";
 
 const Container = styled.div`
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding: 2rem;
+  padding: 1rem;
   background: #ebeef6;
   @media only screen and (max-width: 600px) {
     padding: 0;
@@ -70,6 +71,18 @@ const Form = styled.form`
   width: auto;
   max-width: 300px;
 `;
+const Error = styled.div`
+  width: 100%;
+  margin-top: 15px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: red;
+`;
+
+const loginSchema = object({
+  password: string().min(6, "Incorrect credentials."),
+  rollOrNumber: string().min(6, "Incorrect credentials."),
+});
 
 export default function LoginPage() {
   // states and hooks
@@ -80,6 +93,7 @@ export default function LoginPage() {
   const [rollOrNumber, setRollOrNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   // effects
   useEffect(() => {
@@ -101,9 +115,18 @@ export default function LoginPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
-      setIsSubmitting(false);
-      const user = { auth: true, name: "Arb Rahim Badsa" };
-      dispatcher(setUser(user));
+      const test = { rollOrNumber, password };
+      loginSchema
+        .validate(test)
+        .then((tested) => {
+          const user = { auth: true, name: "Arb Rahim Badsa" };
+          dispatcher(setUser(user));
+          setIsSubmitting(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setIsSubmitting(false);
+        });
     }, 3000);
   };
   return (
@@ -118,6 +141,7 @@ export default function LoginPage() {
                 Practice with tons of real questions. Trust your goals. Real
                 flame your skills.
               </GreyText>
+              {error && <Error>{error}</Error>}
               <Input
                 label="Roll or Phone"
                 placeholder="Enter your roll"

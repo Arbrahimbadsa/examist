@@ -11,12 +11,13 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../redux/reducers/userSlice";
 import { useEffect } from "react";
 import Logo from "./Logo";
+import { string, object } from "yup";
 
 const Container = styled.div`
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding: 2rem;
+  padding: 1rem;
   background: #ebeef6;
   @media only screen and (max-width: 600px) {
     padding: 0;
@@ -66,6 +67,20 @@ const Form = styled.form`
   width: auto;
   max-width: 300px;
 `;
+const Error = styled.div`
+  width: 100%;
+  margin-top: 15px;
+  padding: 5px 0;
+  font-size: 14px;
+  color: red;
+`;
+
+const registrationSchema = object({
+  name: string().min(3, "Name shoulbe at least 3 digits."),
+  phone: string().length(11, "Phone number must be 11 digits."),
+  password: string().min(6, "Passwrod should be at least 6 digits."),
+});
+
 export default function RegistrationPage() {
   const theme = useTheme();
   const auth = useAuth();
@@ -75,6 +90,7 @@ export default function RegistrationPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   // effects
   useEffect(() => {
@@ -91,9 +107,18 @@ export default function RegistrationPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
-      const user = { auth: true, name: "Arb Rahim Badsa" };
-      dispatcher(setUser(user));
-      setIsSubmitting(false);
+      const test = { name, phone, password };
+      registrationSchema
+        .validate(test)
+        .then((tested) => {
+          const user = { auth: true, name: "Arb Rahim Badsa" };
+          dispatcher(setUser(user));
+          setIsSubmitting(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setIsSubmitting(false);
+        });
     }, 3000);
   };
   return (
@@ -108,6 +133,7 @@ export default function RegistrationPage() {
                 Practice with tons of real questions. Trust your goals. Real
                 flame your skills.
               </GreyText>
+              {error && <Error>{error}</Error>}
               <Input
                 label="Name"
                 placeholder="Enter your name"
