@@ -5,12 +5,20 @@ const theme = {
       bg: "#101727",
       text: "#101727",
     },
+    dashboard: {
+      sidebarBg: "#101727",
+      sidebarItemActive: "#13b2ec",
+    },
   },
   dark: {
     color: "black",
     loginPage: {
       bg: "#101727",
       text: "#101727",
+    },
+    dashboard: {
+      sidebarBg: "#101727",
+      sidebarItemActive: "#13b2ec",
     },
   },
 };
