@@ -20,7 +20,7 @@ const Container = styled.div`
   height: 100vh;
   width: 100vw;
   padding: 1rem;
-  background: #ebeef6;
+  background: ${(props) => props.theme.mainBg};
   @media only screen and (max-width: 600px) {
     padding: 0;
     align-items: center;
@@ -131,7 +131,7 @@ export default function LoginPage() {
   };
   return (
     !auth && (
-      <Container>
+      <Container theme={theme}>
         <Logo phone dim={150} />
         <LeftSide>
           <LeftSideContent>

@@ -33,6 +33,7 @@ const userSlice = createSlice({
     },
     logout: (state) => {
       localStorage.removeItem("user");
+      localStorage.removeItem("contentIndex");
       state.value = null;
     },
   },

@@ -1,6 +1,7 @@
 const theme = {
   light: {
     color: "red",
+    mainBg: "#ebeef6",
     loginPage: {
       bg: "#101727",
       text: "#101727",
@@ -12,6 +13,7 @@ const theme = {
   },
   dark: {
     color: "black",
+    mainBg: "#ebeef6",
     loginPage: {
       bg: "#101727",
       text: "#101727",

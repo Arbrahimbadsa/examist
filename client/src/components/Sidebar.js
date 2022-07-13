@@ -1,9 +1,16 @@
 import styled from "styled-components";
 import useTheme from "../hooks/useTheme";
-import { Grid, Edit2, CloudLightning } from "react-feather";
+import { Grid, Edit2, BarChart } from "react-feather";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setContentIndex } from "../redux/reducers/contentIndexSlice";
+import {
+  setContentIndex,
+  updateContentIndex,
+} from "../redux/reducers/contentIndexSlice";
+import Logo from "./Logo";
+import { useEffect } from "react";
+import useContentIndex from "../hooks/useContentIndex";
+
 const SidebarHolder = styled.div`
   background: ${(props) => props.theme.sidebarBg};
   width: 220px;
@@ -17,8 +24,12 @@ const SidebarHeader = styled.div`
   height: auto;
   width: 100%;
 `;
-const SidebarHeaderText = styled.h3`
+const SidebarHeaderText = styled.p`
   margin: 20px 0 10px 20px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 20px;
 `;
 const SidebarItemsHolder = styled.div`
   flex-grow: 2;
@@ -52,21 +63,26 @@ const SidebarItem = ({ label, icon, active, onClick }) => {
 
 export default function Sidebar() {
   const theme = useTheme("dashboard");
-  const [activeItem, setActiveItem] = useState(0);
+  const contentIndex = useContentIndex();
   const dispatcher = useDispatch();
   const [items] = useState([
     { label: "Dashboard", icon: <Grid size={20} /> },
     { label: "Exams", icon: <Edit2 size={20} /> },
-    { label: "Performance", icon: <CloudLightning size={18} /> },
+    { label: "Performance", icon: <BarChart size={18} /> },
   ]);
   const handleItemClick = (id) => {
-    setActiveItem(id);
     dispatcher(setContentIndex(id));
   };
+  useEffect(() => {
+    dispatcher(updateContentIndex());
+  }, [dispatcher]);
   return (
     <SidebarHolder theme={theme}>
       <SidebarHeader>
-        <SidebarHeaderText>Flame</SidebarHeaderText>
+        <SidebarHeaderText>
+          <Logo dim={40} />
+          Flame
+        </SidebarHeaderText>
       </SidebarHeader>
       <SidebarItemsHolder>
         {items &&
@@ -75,7 +91,7 @@ export default function Sidebar() {
               label={item.label}
               icon={item.icon}
               key={i}
-              active={i === activeItem}
+              active={i === contentIndex}
               onClick={() => handleItemClick(i)}
             />
           ))}
