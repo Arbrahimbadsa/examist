@@ -14,6 +14,8 @@ import {
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { switchTheme } from "../redux/reducers/themeSlice";
+import { Menu, MenuItem } from "./Menu";
+import { logout } from "../redux/reducers/userSlice";
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -114,6 +116,7 @@ const Switcher = () => {
 };
 
 export default function HeaderTop() {
+  const dispatcher = useDispatch();
   const [categories] = useState([
     {
       label: "New",
@@ -137,6 +140,7 @@ export default function HeaderTop() {
     },
   ]);
   const [activeCategory, setActiveCategory] = useState(0);
+  const [userMenu, setUserMenu] = useState(false);
   return (
     <HeaderTopHolder>
       <HeaderTopLeft>
@@ -153,7 +157,7 @@ export default function HeaderTop() {
       </HeaderTopLeft>
       <HeaderTopRight>
         <Switcher />
-        <HeaderUserInfoHolder>
+        <HeaderUserInfoHolder onClick={() => setUserMenu(true)}>
           <Avatar alt="user" src={userImage} />
           <MetaHolder>
             <UserName>Arb Rahim Badsa</UserName>
@@ -165,6 +169,24 @@ export default function HeaderTop() {
             <ChevronDown size={20} />
           </ChevronHolder>
         </HeaderUserInfoHolder>
+        <Menu
+          top={58}
+          width={200}
+          show={userMenu}
+          onClose={() => setUserMenu(false)}
+        >
+          <MenuItem>Points</MenuItem>
+          <MenuItem>Upgrade</MenuItem>
+          <MenuItem>Settings</MenuItem>
+          <MenuItem
+            onItemClick={() => {
+              setUserMenu(false);
+              dispatcher(logout());
+            }}
+          >
+            Logout
+          </MenuItem>
+        </Menu>
       </HeaderTopRight>
     </HeaderTopHolder>
   );
