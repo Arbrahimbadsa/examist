@@ -7,6 +7,12 @@ const Flame = styled.img`
   @media only screen and (max-width: 600px) {
     display: ${(props) => (props.phone ? "block" : "none")};
   }
+  ${(props) =>
+    props.phone &&
+    `
+    position: relative;
+    top: -2px;
+  `}
 `;
 export default function Logo({ dim, desktop, phone }) {
   return (

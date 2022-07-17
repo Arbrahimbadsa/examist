@@ -9,6 +9,7 @@ import {
   Plus,
   Settings,
   Sun,
+  Menu as Humbarger,
   Users,
 } from "react-feather";
 import { useState } from "react";
@@ -16,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { switchTheme } from "../redux/reducers/themeSlice";
 import { Menu, MenuItem } from "./Menu";
 import { logout } from "../redux/reducers/userSlice";
+import Logo from "./Logo";
+import { setShowSidebar } from "../redux/reducers/sidebarSlice";
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -23,6 +26,10 @@ const HeaderTopHolder = styled.div`
   height: 55px;
   padding: 0 25px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  @media only screen and (max-width: 600px) {
+    padding: 0;
+    padding-left: 15px;
+  }
 `;
 const HeaderTopLeft = styled.div`
   height: 100%;
@@ -47,6 +54,9 @@ const MetaHolder = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  @media only screen and (max-width: 600px) {
+    display: none;
+  }
 `;
 const UserName = styled.span`
   font-size: 14.5px;
@@ -56,6 +66,9 @@ const RankText = styled.span`
 `;
 const ChevronHolder = styled.div`
   margin: 0 0 0 10px;
+  @media only screen and (max-width: 600px) {
+    display: none;
+  }
 `;
 const HeaderUserInfoHolder = styled.div`
   display: flex;
@@ -79,6 +92,9 @@ const CategoryHolder = styled.div`
   &:hover {
     opacity: 0.5;
   }`}
+  @media only screen and (max-width: 600px) {
+    display: none;
+  }
 `;
 const CategoryLabel = styled.p`
   margin: 0 10px;
@@ -93,6 +109,25 @@ const SwitchThemeHolder = styled.div`
     opacity: 0.5;
   }
   cursor: pointer;
+`;
+const HeaderOnPhoneHolder = styled.div`
+  display: none;
+  @media only screen and (max-width: 600px) {
+    display: flex;
+    align-items: center;
+  }
+`;
+const MetaHolderOnPhone = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+`;
+const TitleOnPhone = styled.p`
+  font-size: 20px;
+`;
+const IconHolder = styled.div`
+  cursor: pointer;
+  display: flex;
 `;
 
 const Category = ({ label, icon, active, onClick }) => {
@@ -144,6 +179,15 @@ export default function HeaderTop() {
   return (
     <HeaderTopHolder>
       <HeaderTopLeft>
+        <HeaderOnPhoneHolder>
+          <MetaHolderOnPhone>
+            <IconHolder onClick={() => dispatcher(setShowSidebar(true))}>
+              <Humbarger size={25} />
+            </IconHolder>
+            <Logo dim={35} phone />
+            <TitleOnPhone>Flame</TitleOnPhone>
+          </MetaHolderOnPhone>
+        </HeaderOnPhoneHolder>
         {categories &&
           categories.map((category, i) => (
             <Category

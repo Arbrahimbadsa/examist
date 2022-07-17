@@ -2,7 +2,7 @@ import styled from "styled-components";
 import useTheme from "../hooks/useTheme";
 import { Grid, Edit2, BarChart } from "react-feather";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setContentIndex,
   updateContentIndex,
@@ -10,6 +10,9 @@ import {
 import Logo from "./Logo";
 import { useEffect } from "react";
 import useContentIndex from "../hooks/useContentIndex";
+import { useRef } from "react";
+import { setShowSidebar } from "../redux/reducers/sidebarSlice";
+import { useLayoutEffect } from "react";
 
 const SidebarHolder = styled.div`
   background: ${(props) => props.theme.sidebarBg};
@@ -18,6 +21,12 @@ const SidebarHolder = styled.div`
   color: #fff;
   display: flex;
   flex-direction: column;
+  @media only screen and (max-width: 600px) {
+    transition: 0.2s;
+    position: absolute;
+    left: -220px;
+    z-index: 999;
+  }
 `;
 const SidebarHeader = styled.div`
   display: inline-block;
@@ -50,6 +59,15 @@ const SidebarItemHolder = styled.div`
 const SidebarItemText = styled.p`
   margin-left: 8px;
 `;
+const Backdrop = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  height: 100vh;
+  width: 100vw;
+  display: ${(props) => (props.show ? "block" : "none")};
+`;
 
 const SidebarItem = ({ label, icon, active, onClick }) => {
   const theme = useTheme("dashboard");
@@ -62,6 +80,8 @@ const SidebarItem = ({ label, icon, active, onClick }) => {
 };
 
 export default function Sidebar() {
+  const sidebarRef = useRef();
+  const showSidebar = useSelector((state) => state.showSidebar.value);
   const theme = useTheme("dashboard");
   const contentIndex = useContentIndex();
   const dispatcher = useDispatch();
@@ -72,30 +92,46 @@ export default function Sidebar() {
   ]);
   const handleItemClick = (id) => {
     dispatcher(setContentIndex(id));
+    dispatcher(setShowSidebar(false));
   };
   useEffect(() => {
     dispatcher(updateContentIndex());
   }, [dispatcher]);
+  useLayoutEffect(() => {
+    if (showSidebar !== null) {
+      if (showSidebar === true) {
+        sidebarRef.current.style.left = "0";
+      } else {
+        sidebarRef.current.style.left = "-220px";
+      }
+    }
+  }, [showSidebar]);
   return (
-    <SidebarHolder theme={theme}>
-      <SidebarHeader>
-        <SidebarHeaderText>
-          <Logo dim={40} />
-          Flame
-        </SidebarHeaderText>
-      </SidebarHeader>
-      <SidebarItemsHolder>
-        {items &&
-          items.map((item, i) => (
-            <SidebarItem
-              label={item.label}
-              icon={item.icon}
-              key={i}
-              active={i === contentIndex}
-              onClick={() => handleItemClick(i)}
-            />
-          ))}
-      </SidebarItemsHolder>
-    </SidebarHolder>
+    <>
+      <Backdrop
+        show={showSidebar}
+        onClick={() => dispatcher(setShowSidebar(false))}
+      />
+      <SidebarHolder ref={sidebarRef} theme={theme}>
+        <SidebarHeader>
+          <SidebarHeaderText>
+            <Logo dim={40} />
+            Flame
+          </SidebarHeaderText>
+        </SidebarHeader>
+        <SidebarItemsHolder>
+          {items &&
+            items.map((item, i) => (
+              <SidebarItem
+                label={item.label}
+                icon={item.icon}
+                key={i}
+                active={i === contentIndex}
+                onClick={() => handleItemClick(i)}
+              />
+            ))}
+        </SidebarItemsHolder>
+      </SidebarHolder>
+    </>
   );
 }

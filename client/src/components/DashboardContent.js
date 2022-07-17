@@ -3,6 +3,7 @@ import useContentIndex from "../hooks/useContentIndex";
 import useTheme from "../hooks/useTheme";
 import HeaderTop from "./HeaderTop";
 import DashboardContantContainer from "./DashboardContentContainer";
+import DashboardMainContent from "./DashboardMainContent";
 const DashboardContentHolder = styled.div`
   height: 100vh;
   width: 100%;
@@ -17,7 +18,7 @@ export default function DashboardContent() {
     <DashboardContentHolder theme={theme}>
       <HeaderTop />
       <DashboardContantContainer>
-        {contentIndex === 0 && <p>I am dashboard.</p>}
+        {contentIndex === 0 && <DashboardMainContent />}
         {contentIndex === 1 && <h1>Hello I am exams.</h1>}
         {contentIndex === 2 && <h1>Hello I am performance.</h1>}
       </DashboardContantContainer>
