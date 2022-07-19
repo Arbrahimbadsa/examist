@@ -1,6 +1,6 @@
 const theme = {
   light: {
-    optionColor: "#13b2ec",
+    optionColor: "#A8A8A8",
     mainBg: "#ebeef6",
     loginPage: {
       bg: "#101727",

@@ -22,18 +22,23 @@ const OptionHolder = styled.div`
       : props.theme.optionColor};
   padding: 5px;
   color: #fff;
-  cursor: pointer;
   text-align: center;
   border-radius: 3px;
-  &:hover {
+  ${(props) =>
+    !props.touched &&
+    `&:hover {
     opacity: 0.8;
-  }
+  cursor: pointer;
+  }`}
+  ${(props) => props.changCorrectBg && `background: green;`}
 `;
 export function QuestionOption({
   label,
   onOptionClick,
   selectedCorrect,
   selectedInCorrect,
+  changCorrectBg,
+  touched,
 }) {
   const theme = useTheme();
   return (
@@ -42,6 +47,8 @@ export function QuestionOption({
       theme={theme}
       selectedCorrect={selectedCorrect}
       selectedInCorrect={selectedInCorrect}
+      touched={touched}
+      changCorrectBg={changCorrectBg}
     >
       {label}
     </OptionHolder>

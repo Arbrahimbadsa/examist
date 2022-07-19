@@ -23,6 +23,17 @@ const DotHolder = styled.p`
   top: -2px;
   color: grey;
 `;
+const CardActionsHolder = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  flex-grow: 1;
+`;
+const CardTitleText = styled.span`
+  display: block;
+`;
+export function CardActions({ children }) {
+  return <CardActionsHolder>{children}</CardActionsHolder>;
+}
 export function CardDotLine({ beforeDot, afterDot }) {
   return (
     <DotLineHolder>
@@ -32,8 +43,13 @@ export function CardDotLine({ beforeDot, afterDot }) {
     </DotLineHolder>
   );
 }
-export function CardHeader({ children }) {
-  return <CardHeaderHolder>{children}</CardHeaderHolder>;
+export function CardHeader({ title, actions }) {
+  return (
+    <CardHeaderHolder>
+      <CardTitleText>{title}</CardTitleText>
+      <CardActions>{actions}</CardActions>
+    </CardHeaderHolder>
+  );
 }
 export function Card({ children }) {
   return <CardHolder>{children}</CardHolder>;

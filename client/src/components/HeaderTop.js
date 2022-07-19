@@ -19,6 +19,7 @@ import { Menu, MenuItem } from "./Menu";
 import { logout } from "../redux/reducers/userSlice";
 import Logo from "./Logo";
 import { setShowSidebar } from "../redux/reducers/sidebarSlice";
+import IconButton from "./IconButton";
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -48,7 +49,7 @@ const Avatar = styled.img`
   height: 35px;
   width: 35px;
   border-radius: 50%;
-  margin: 0 15px;
+  margin-right: 15px;
 `;
 const MetaHolder = styled.div`
   display: flex;
@@ -101,15 +102,6 @@ const CategoryLabel = styled.p`
   display: flex;
   align-items: center;
 `;
-
-const SwitchThemeHolder = styled.div`
-  display: flex;
-  align-items: center;
-  &:hover {
-    opacity: 0.5;
-  }
-  cursor: pointer;
-`;
 const HeaderOnPhoneHolder = styled.div`
   display: none;
   @media only screen and (max-width: 600px) {
@@ -133,7 +125,7 @@ const IconHolder = styled.div`
 const Category = ({ label, icon, active, onClick }) => {
   return (
     <CategoryHolder onClick={onClick} active={active}>
-      {icon}
+      <IconButton margin="0">{icon}</IconButton>
       <CategoryLabel>{label}</CategoryLabel>
     </CategoryHolder>
   );
@@ -143,10 +135,10 @@ const Switcher = () => {
   const mode = useSelector((state) => state.theme.value);
   const dispatcher = useDispatch();
   return (
-    <SwitchThemeHolder onClick={() => dispatcher(switchTheme())}>
+    <IconButton onClick={() => dispatcher(switchTheme())}>
       {mode === "light" && <Moon size={20} />}
       {mode === "dark" && <Sun size={20} />}
-    </SwitchThemeHolder>
+    </IconButton>
   );
 };
 

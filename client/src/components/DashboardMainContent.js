@@ -32,7 +32,7 @@ export default function DashboardMainContent() {
       <MainContent>
         <QuickPractice />
         <Card>
-          <CardHeader>Analytics</CardHeader>
+          <CardHeader title="Analytics" />
         </Card>
       </MainContent>
     </>

@@ -12,6 +12,9 @@ import {
   QuestionOption,
   QuestionOptions,
 } from "./Question";
+import IconButton from "./IconButton";
+import { RefreshCcw } from "react-feather";
+import { getRandomQuestion } from "../helpers/getDashboardQuestion";
 export default function QuickPractice() {
   const dispatcher = useDispatch();
   const { label, options, selectedIndex, correctIndex, touched } =
@@ -31,7 +34,26 @@ export default function QuickPractice() {
   };
   return (
     <Card>
-      <CardHeader>Quick Practice</CardHeader>
+      <CardHeader
+        title="Quick Practice"
+        actions={
+          <>
+            <IconButton
+              margin="0"
+              onClick={() =>
+                dispatcher(setDashboardQuestion(getRandomQuestion()))
+              }
+            >
+              <RefreshCcw size={15} />
+            </IconButton>
+            {/* 
+            // for future feature
+            <IconButton margin="0 0 0 5px">
+              <MoreVertical size={15} />
+            </IconButton> */}
+          </>
+        }
+      />
       <CardDotLine beforeDot="Chemistry" afterDot="Chapter One" />
       <Question>
         <QuestionLabel>{label}</QuestionLabel>
@@ -47,6 +69,12 @@ export default function QuickPractice() {
                 }
                 selectedInCorrect={
                   i === selectedIndex && selectedIndex !== correctIndex
+                }
+                touched={touched}
+                changCorrectBg={
+                  touched &&
+                  i === correctIndex &&
+                  selectedIndex !== correctIndex
                 }
               />
             ))}
