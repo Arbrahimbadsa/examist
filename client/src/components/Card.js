@@ -4,10 +4,12 @@ const CardHolder = styled.div`
   background: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   border-radius: 5px;
+  ${(props) => props.minHeight && `min-hieght: ${(props) => props.minHeight}`}
 `;
 const CardHeaderHolder = styled.div`
   display: flex;
   align-items: center;
+  margin: ${(props) => props.margin};
 `;
 const DotLineHolder = styled.div`
   display: flex;
@@ -43,14 +45,14 @@ export function CardDotLine({ beforeDot, afterDot }) {
     </DotLineHolder>
   );
 }
-export function CardHeader({ title, actions }) {
+export function CardHeader({ title, actions, margin }) {
   return (
-    <CardHeaderHolder>
+    <CardHeaderHolder margin={margin}>
       <CardTitleText>{title}</CardTitleText>
       <CardActions>{actions}</CardActions>
     </CardHeaderHolder>
   );
 }
-export function Card({ children }) {
-  return <CardHolder>{children}</CardHolder>;
+export function Card({ children, ...rest }) {
+  return <CardHolder {...rest}>{children}</CardHolder>;
 }

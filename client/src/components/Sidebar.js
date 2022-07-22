@@ -25,7 +25,7 @@ const SidebarHolder = styled.div`
     transition: 0.2s;
     position: absolute;
     left: -220px;
-    z-index: 999;
+    z-index: 999 !important;
   }
 `;
 const SidebarHeader = styled.div`
@@ -67,6 +67,7 @@ const Backdrop = styled.div`
   height: 100vh;
   width: 100vw;
   display: ${(props) => (props.show ? "block" : "none")};
+  z-index: 998 !important;
 `;
 
 const SidebarItem = ({ label, icon, active, onClick }) => {

@@ -1,6 +1,7 @@
 import { Home } from "react-feather";
 import styled from "styled-components";
 import { CardHeader, Card } from "./Card";
+import DashboardAnalytics from "./DashboardAnalytics";
 import QuickPractice from "./QuickPractice";
 const MainContent = styled.div`
   width: 100%;
@@ -31,8 +32,9 @@ export default function DashboardMainContent() {
       </PageTitle>
       <MainContent>
         <QuickPractice />
-        <Card>
+        <Card centered={true}>
           <CardHeader title="Analytics" />
+          <DashboardAnalytics />
         </Card>
       </MainContent>
     </>
