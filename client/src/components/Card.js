@@ -33,6 +33,16 @@ const CardActionsHolder = styled.div`
 const CardTitleText = styled.span`
   display: block;
 `;
+const CardContentHolder = styled.div`
+  height: 95%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export function CardContent({ children }) {
+  return <CardContentHolder>{children}</CardContentHolder>;
+}
 export function CardActions({ children }) {
   return <CardActionsHolder>{children}</CardActionsHolder>;
 }

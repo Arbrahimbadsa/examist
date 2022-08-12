@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import useTheme from "../hooks/useTheme";
+import RenderLatex from "./RenderLatex";
 const QuestionHolder = styled.div`
   height: auto;
   width: 100%;
@@ -30,14 +31,14 @@ const OptionHolder = styled.div`
     opacity: 0.8;
   cursor: pointer;
   }`}
-  ${(props) => props.changCorrectBg && `background: green;`}
+  ${(props) => props.changeCorrectBg && `background: green;`}
 `;
 export function QuestionOption({
   label,
   onOptionClick,
   selectedCorrect,
   selectedInCorrect,
-  changCorrectBg,
+  changeCorrectBg,
   touched,
 }) {
   const theme = useTheme();
@@ -48,9 +49,9 @@ export function QuestionOption({
       selectedCorrect={selectedCorrect}
       selectedInCorrect={selectedInCorrect}
       touched={touched}
-      changCorrectBg={changCorrectBg}
+      changeCorrectBg={changeCorrectBg}
     >
-      {label}
+      <RenderLatex latex={label} />
     </OptionHolder>
   );
 }

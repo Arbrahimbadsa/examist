@@ -8,6 +8,7 @@ const Title = styled.h1`
   @media only screen and (max-width: 600px) {
     margin-top: 10px;
   }
+  font-family: "Poppins", sans-serif;
 `;
 export default function TitleText({ children, topMargin }) {
   const theme = useTheme();

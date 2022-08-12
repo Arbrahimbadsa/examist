@@ -20,6 +20,7 @@ const Container = styled.div`
   height: 100vh;
   width: 100vw;
   padding: 1rem;
+  font-family: "Poppins", sans-serif;
   background: ${(props) => props.theme.mainBg};
   @media only screen and (max-width: 600px) {
     padding: 0;

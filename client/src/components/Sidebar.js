@@ -21,6 +21,7 @@ const SidebarHolder = styled.div`
   color: #fff;
   display: flex;
   flex-direction: column;
+  font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
     transition: 0.2s;
     position: absolute;

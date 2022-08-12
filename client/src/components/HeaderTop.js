@@ -27,9 +27,12 @@ const HeaderTopHolder = styled.div`
   height: 55px;
   padding: 0 25px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
     padding: 0;
     padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 `;
 const HeaderTopLeft = styled.div`
