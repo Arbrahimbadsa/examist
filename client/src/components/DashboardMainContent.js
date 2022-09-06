@@ -12,6 +12,7 @@ const MainContent = styled.div`
     grid-template-columns: 1fr;
   }
   font-family: "Poppins", sans-serif;
+  padding-bottom: 65px;
 `;
 const PageTitle = styled.div`
   margin-bottom: 10px;

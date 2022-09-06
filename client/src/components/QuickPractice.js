@@ -39,6 +39,7 @@ export default function QuickPractice() {
   const handleOptionClick = (index) => {
     if (!touched) dispatcher(setDashboardQuestionOption(index));
   };
+  const abcd = ["A", "B", "C", "D"];
   return (
     <Card>
       <CardHeader
@@ -70,6 +71,7 @@ export default function QuickPractice() {
           {options &&
             options.map((option, i) => (
               <QuestionOption
+                optionCount={abcd[i]}
                 onOptionClick={() => handleOptionClick(i)}
                 key={i}
                 label={option}
@@ -85,6 +87,7 @@ export default function QuickPractice() {
                   i === correctIndex &&
                   selectedIndex !== correctIndex
                 }
+                onlyOne={true}
               />
             ))}
         </QuestionOptions>

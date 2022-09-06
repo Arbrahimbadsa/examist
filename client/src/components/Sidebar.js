@@ -13,6 +13,7 @@ import useContentIndex from "../hooks/useContentIndex";
 import { useRef } from "react";
 import { setShowSidebar } from "../redux/reducers/sidebarSlice";
 import { useLayoutEffect } from "react";
+import useDim from "../hooks/useDim";
 
 const SidebarHolder = styled.div`
   background: ${(props) => props.theme.sidebarBg};
@@ -22,12 +23,21 @@ const SidebarHolder = styled.div`
   display: flex;
   flex-direction: column;
   font-family: "Poppins", sans-serif;
+  position: relative;
   @media only screen and (max-width: 600px) {
     transition: 0.2s;
     position: absolute;
     left: -220px;
     z-index: 999 !important;
   }
+`;
+const SidebarHider = styled.div`
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  z-index: 999999999;
+  position: absolute;
 `;
 const SidebarHeader = styled.div`
   display: inline-block;
@@ -84,30 +94,36 @@ const SidebarItem = ({ label, icon, active, onClick }) => {
 export default function Sidebar() {
   const sidebarRef = useRef();
   const showSidebar = useSelector((state) => state.showSidebar.value);
+  const isExamStarted = useSelector((state) => state.isExamStarted.value);
   const theme = useTheme("dashboard");
   const contentIndex = useContentIndex();
   const dispatcher = useDispatch();
+  const isPc = useDim();
   const [items] = useState([
     { label: "Dashboard", icon: <Grid size={20} /> },
     { label: "Exams", icon: <Edit2 size={20} /> },
     { label: "Performance", icon: <BarChart size={18} /> },
   ]);
   const handleItemClick = (id) => {
-    dispatcher(setContentIndex(id));
-    dispatcher(setShowSidebar(false));
+    if (!isExamStarted) {
+      dispatcher(setContentIndex(id));
+      dispatcher(setShowSidebar(false));
+    }
   };
   useEffect(() => {
     dispatcher(updateContentIndex());
   }, [dispatcher]);
   useLayoutEffect(() => {
-    if (showSidebar !== null) {
-      if (showSidebar === true) {
-        sidebarRef.current.style.left = "0";
-      } else {
-        sidebarRef.current.style.left = "-220px";
+    if (!isPc) {
+      if (showSidebar !== null) {
+        if (showSidebar === true) {
+          sidebarRef.current.style.left = "0";
+        } else {
+          sidebarRef.current.style.left = "-220px";
+        }
       }
     }
-  }, [showSidebar]);
+  }, [showSidebar, isPc]);
   return (
     <>
       <Backdrop
@@ -115,6 +131,7 @@ export default function Sidebar() {
         onClick={() => dispatcher(setShowSidebar(false))}
       />
       <SidebarHolder ref={sidebarRef} theme={theme}>
+        {isExamStarted && <SidebarHider />}
         <SidebarHeader>
           <SidebarHeaderText>
             <Logo dim={40} />
