@@ -14,9 +14,10 @@ const Flame = styled.img`
     top: -2px;
   `}
 `;
-export default function Logo({ dim, desktop, phone }) {
+export default function Logo({ dim, desktop, phone, ...rest }) {
   return (
     <Flame
+      {...rest}
       dim={dim}
       src={flame}
       desktop={desktop}

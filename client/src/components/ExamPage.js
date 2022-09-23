@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Timer from "./Timer";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,12 +13,18 @@ import {
 } from "./Question";
 import RenderLatex from "./RenderLatex";
 import { setSelectedIndex } from "../redux/reducers/examSlice";
+import GoTop from "./GoTop";
+import formatLocalTime from "../utils/formatLocalTime";
+import { Check, Clock, List, Slash, Target, X } from "react-feather";
+import { Dialog, DialogBody } from "./Dialog";
 const ExamPageContainer = styled.div`
-  padding: 10px 20% 10px 20%;
+  padding: 26px 20% 10px 20%;
   font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
-    padding: 10px 0 65px 0;
+    padding: 16px 16px 65px 16px;
   }
+  height: 100vh;
+  overflow-y: scroll;
 `;
 const QuestionsHolder = styled.div``;
 const QuestionWrapper = styled.div`
@@ -79,80 +85,357 @@ const TimeMetaHolder = styled.p`
   color: grey;
   font-size: 15px;
 `;
+const SubmitButtonHolder = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+const SubmitButton = styled.div`
+  height: 45px;
+  width: 150px;
+  background: #13b2ec;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 0;
+`;
+const LoadingHolder = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: grey;
+`;
+const ExamInfoHolder = styled.div`
+  height: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+`;
+const ExamInfo = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: grey;
+  border-right: 1px solid grey;
+  padding: 0 10px;
+  &:last-child {
+    border: none;
+  }
+  font-size: 15px;
+`;
+const DialogSubmitButton = styled.button`
+  height: auto;
+  width: auto;
+  padding: 10px 30px;
+  border: none;
+  background: #13b2ec;
+  color: #fff;
+  margin: 15px 0 0 0;
+  cursor: pointer;
+  border-radius: 5px;
+`;
+const Info = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const InfoText = styled.p`
+  font-size: 15px;
+  color: #26d95f;
+`;
+const CountAndCorrect = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+const CorrectText = styled.p`
+  color: ${(props) => (props.correct ? "#26d95f" : "red")};
+`;
+const ObtainedText = styled.p`
+  color: #a4b8ca;
+  font-size: 14px;
+`;
+
 export default function ExamPage() {
-  const examTime = 60 * 2;
+  // timer
+  const examTime = 15; // in min
   const time = new Date();
-  // questions
-  const { questions } = useSelector((state) => state.exam.value);
-  time.setSeconds(time.getSeconds() + examTime);
+  time.setSeconds(time.getSeconds() + examTime * 60);
+
+  // time calc
+  const now = new Date();
+  const afterExam = new Date();
+  afterExam.setSeconds(afterExam.getSeconds() + examTime * 60);
+
+  // dispatcher
   const dispatcher = useDispatch();
+
+  // states (redux)
+  const { questions } = useSelector((state) => state.exam.value);
+  const isGeneratingQuestion = useSelector(
+    (state) => state.loading.isGeneratingQuestion
+  );
+
+  // states (pure)
+  const [areYouSure, setAreYouSure] = useState(false);
+  const [showExamPage, setShowExamPage] = useState(true);
+  const [isExamSubmitting, setIsExamSubmitting] = useState(false);
+  const abcd = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+
+  // hooks
   const contentIndex = useContentIndex();
+
+  // refs
+  const container = useRef(null);
+
+  // handles
+  const handleExamSubmit = () => {
+    setAreYouSure(true);
+  };
+
+  const handleConfirmSubmit = () => {
+    window.onbeforeunload = () => {};
+    console.log(window.answerSheet);
+    setAreYouSure(false);
+    dispatcher(disableContent(false));
+    setShowExamPage(false);
+    setIsExamSubmitting(true);
+    setTimeout(() => {
+      setIsExamSubmitting(false);
+    }, 3000);
+  };
+
+  const resetToHomePage = () => {
+    dispatcher(disableContent(false));
+    dispatcher(setContentIndex(0));
+    window.answerSheet = null;
+    window.onbeforeunload = () => {};
+  };
+
+  // effects
   useEffect(() => {
     if (contentIndex === 50) {
       dispatcher(disableContent(true));
     }
   }, [contentIndex, dispatcher]);
-  const abcd = ["A", "B", "C", "D"];
-  const elem = useSelector((state) => state.position.value);
-  useEffect(() => {
-    console.log(elem);
-  }, [elem]);
 
-  // time calc
-  const now = new Date();
-  const afterExam = new Date();
-  afterExam.setSeconds(afterExam.getSeconds() + examTime);
+  useEffect(() => {
+    window.onbeforeunload = () => "Would you like to proceed?";
+  }, []);
 
   return (
-    <ExamPageContainer>
-      <ExamHeaderHolder>
-        <h3>Quick exam - 15</h3>
-        <MetaHolder>
-          <TimeMetaHolder>Start: {now.toLocaleTimeString()}</TimeMetaHolder>
-          <TimeMetaHolder>End: {afterExam.toLocaleTimeString()}</TimeMetaHolder>
-        </MetaHolder>
-      </ExamHeaderHolder>
-      <TimerAndExitHolder>
-        <Timer expiryTimestamp={time} onExpire={() => alert("Ok done!")} />
-        <ExitButton
-          onClick={() => {
-            dispatcher(disableContent(false));
-            dispatcher(setContentIndex(0));
-            console.log(window.answerSheet);
-          }}
+    <>
+      <ExamPageContainer ref={container}>
+        <Dialog
+          show={areYouSure}
+          title="Are you sure you want to submit?"
+          small
+          onClose={() => setAreYouSure(false)}
         >
-          Exit
-        </ExitButton>
-      </TimerAndExitHolder>
-      <QuestionsHolder>
-        {questions.map((question, i) => (
-          <QuestionWrapper key={i}>
-            <QuestionCountHolder>Question {i + 1}</QuestionCountHolder>
-            <Question>
-              <QuestionLabel>
-                <RenderLatex latex={question.label} />
-              </QuestionLabel>
-              <QuestionOptions>
-                {question.options.map((option, j) => (
-                  <QuestionOption
-                    id={j}
-                    onOptionClick={() => {
-                      dispatcher(
-                        setSelectedIndex({ question, index: j + 1, questions })
-                      );
-                    }}
-                    optionCount={abcd[j]}
-                    key={j}
-                    label={option}
-                    touched={question.touched}
-                    onlyOne={false}
+          <DialogBody>
+            <p>This can not be undone.</p>
+            <DialogSubmitButton onClick={handleConfirmSubmit}>
+              Submit
+            </DialogSubmitButton>
+          </DialogBody>
+        </Dialog>
+        {showExamPage ? (
+          <>
+            {isGeneratingQuestion && (
+              <LoadingHolder>Generating a question set...</LoadingHolder>
+            )}
+            {!isGeneratingQuestion && (
+              <>
+                <ExamHeaderHolder>
+                  <h3>Quick exam - 15</h3>
+                  <MetaHolder>
+                    <TimeMetaHolder>
+                      Start: {formatLocalTime(now.toLocaleTimeString())}
+                    </TimeMetaHolder>
+                    <TimeMetaHolder>
+                      End: {formatLocalTime(afterExam.toLocaleTimeString())}
+                    </TimeMetaHolder>
+                  </MetaHolder>
+                  <ExamInfoHolder>
+                    <ExamInfo>
+                      <List style={{ marginRight: "8px" }} size={20} />
+                      <p>{questions.length}</p>
+                    </ExamInfo>
+                    <ExamInfo>
+                      <Clock style={{ marginRight: "8px" }} size={20} />
+                      <p>
+                        {examTime === 60
+                          ? "1 hr"
+                          : examTime > 60
+                          ? "1+ hr"
+                          : examTime + " min"}
+                      </p>
+                    </ExamInfo>
+                    <ExamInfo>
+                      <Target style={{ marginRight: "8px" }} size={20} />
+                      <p>{questions.length}</p>
+                    </ExamInfo>
+                  </ExamInfoHolder>
+                </ExamHeaderHolder>
+                <TimerAndExitHolder>
+                  <Timer
+                    expiryTimestamp={time}
+                    onExpire={() => alert("Ok done!")}
                   />
-                ))}
-              </QuestionOptions>
-            </Question>
-          </QuestionWrapper>
-        ))}
-      </QuestionsHolder>
-    </ExamPageContainer>
+                  <ExitButton onClick={resetToHomePage}>Exit</ExitButton>
+                </TimerAndExitHolder>
+                <QuestionsHolder>
+                  {questions &&
+                    questions.map((question, i) => (
+                      <QuestionWrapper key={i}>
+                        <QuestionCountHolder>
+                          Question {i + 1}
+                        </QuestionCountHolder>
+                        <Question>
+                          <QuestionLabel>
+                            <RenderLatex latex={question.label} />
+                          </QuestionLabel>
+                          <QuestionOptions>
+                            {question.options &&
+                              question.options.map((option, j) => (
+                                <QuestionOption
+                                  id={j}
+                                  onOptionClick={() => {
+                                    dispatcher(
+                                      setSelectedIndex({
+                                        question,
+                                        index: j + 1,
+                                        questions,
+                                      })
+                                    );
+                                  }}
+                                  optionCount={abcd[j]}
+                                  key={j}
+                                  label={option}
+                                  touched={question.touched}
+                                  onlyOne={false}
+                                />
+                              ))}
+                          </QuestionOptions>
+                        </Question>
+                      </QuestionWrapper>
+                    ))}
+                  <SubmitButtonHolder>
+                    <SubmitButton onClick={handleExamSubmit}>
+                      Submit
+                    </SubmitButton>
+                  </SubmitButtonHolder>
+                </QuestionsHolder>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            {isExamSubmitting && (
+              <LoadingHolder>Submitting the exam...</LoadingHolder>
+            )}
+            {!isExamSubmitting && (
+              <>
+                <ExamHeaderHolder>
+                  <h3>Quick exam - 15</h3>
+                  <Info success>
+                    <InfoText>Answers submitted successfully.</InfoText>
+                  </Info>
+                  <ObtainedText>Obtained Marks: 3 / 6</ObtainedText>
+                  <ExamInfoHolder>
+                    <ExamInfo>
+                      <Check
+                        color="#26D95F"
+                        style={{ marginRight: "8px" }}
+                        size={20}
+                      />
+                      <p style={{ color: "#26D95F" }}>{questions.length}</p>
+                    </ExamInfo>
+                    <ExamInfo>
+                      <X color="red" style={{ marginRight: "8px" }} size={20} />
+                      <p style={{ color: "red" }}>10</p>
+                    </ExamInfo>
+                    <ExamInfo>
+                      <Slash style={{ marginRight: "8px" }} size={16} />
+                      <p>{questions.length}</p>
+                    </ExamInfo>
+                  </ExamInfoHolder>
+                </ExamHeaderHolder>
+                <h3>Answersheet ({questions.length})</h3>
+                <QuestionsHolder>
+                  {window.answerSheet &&
+                    window.answerSheet.map((question, i) => (
+                      <QuestionWrapper key={i}>
+                        <CountAndCorrect>
+                          <QuestionCountHolder>
+                            Question {i + 1}
+                          </QuestionCountHolder>
+                          {question.getIsCorrectlyAnswered() !== null ? (
+                            <CorrectText
+                              correct={question.getIsCorrectlyAnswered()}
+                            >
+                              {question.getIsCorrectlyAnswered()
+                                ? "Correct"
+                                : "Incorrect"}
+                            </CorrectText>
+                          ) : (
+                            <p style={{ color: "#a4b8ca" }}>Skipped</p>
+                          )}
+                        </CountAndCorrect>
+                        <Question>
+                          <QuestionLabel>
+                            <RenderLatex latex={question.label} />
+                          </QuestionLabel>
+                          <QuestionOptions>
+                            {question.options &&
+                              question.options.map((option, j) => (
+                                <QuestionOption
+                                  id={j}
+                                  onOptionClick={() => {
+                                    dispatcher(
+                                      setSelectedIndex({
+                                        question,
+                                        index: j + 1,
+                                        questions,
+                                      })
+                                    );
+                                  }}
+                                  optionCount={abcd[j]}
+                                  key={j}
+                                  label={option}
+                                  touched={true}
+                                  changeCorrectBg={
+                                    question.correctAnswer === j + 1
+                                  }
+                                  selectedInCorrect={question.isIncorrect(
+                                    question.correctAnswer,
+                                    j + 1
+                                  )}
+                                  selectedCorrect={question.isCorrect(
+                                    question.correctAnswer,
+                                    j + 1
+                                  )}
+                                  onlyOne={true}
+                                />
+                              ))}
+                          </QuestionOptions>
+                        </Question>
+                      </QuestionWrapper>
+                    ))}
+                </QuestionsHolder>
+              </>
+            )}
+          </>
+        )}
+        <GoTop elem={container} />
+      </ExamPageContainer>
+    </>
   );
 }

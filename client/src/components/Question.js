@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Check } from "react-feather";
 import styled from "styled-components";
 import useTheme from "../hooks/useTheme";
 import RenderLatex from "./RenderLatex";
@@ -64,17 +65,19 @@ const DashboardOptionCount = styled.div`
   align-items: center;
   background: ${(props) =>
     props.selectedCorrect
-      ? "green"
+      ? "#26D95F"
       : props.selectedInCorrect
-      ? "red"
+      ? "#FF0400"
       : props.theme.optionColor};
+  color: ${(props) =>
+    props.selectedCorrect ? "#fff" : props.selectedInCorrect ? "#fff" : "#000"};
   ${(props) =>
     !props.touched &&
     `&:hover {
     opacity: 0.8;
   cursor: pointer;
   }`}
-  ${(props) => props.changeCorrectBg && `background: green;`}
+  ${(props) => props.changeCorrectBg && `background: #26D95F; color: #fff;`}
 `;
 const OptionTextWrapper = styled.div``;
 export function QuestionOption({
@@ -107,7 +110,11 @@ export function QuestionOption({
             touched={touched}
             changeCorrectBg={changeCorrectBg}
           >
-            {optionCount}
+            {changeCorrectBg || selectedCorrect ? (
+              <Check color="#fff" size={20} />
+            ) : (
+              optionCount
+            )}
           </DashboardOptionCount>
         ) : (
           <OptionCount

@@ -8,6 +8,7 @@ const examSlice = createSlice({
   },
   reducers: {
     setQuestions: (state, action) => {
+      window.answerSheet = action.payload;
       state.value = {
         ...state.value,
         questions: action.payload,
@@ -17,12 +18,15 @@ const examSlice = createSlice({
       const question = action.payload.question;
       const index = action.payload.index;
       const questions = action.payload.questions;
-      if (!question.touched) {
-        question.setSelectedIndex(index);
-        question.isTouched();
-      } else {
-        question.isDoubleAnswered();
-      }
+      question.setSelectedIndex(index);
+      question.isTouched();
+      if (question.selectedIndex.length > 1) question.isDoubleAnswered();
+      // if (!question.touched) {
+      //   question.setSelectedIndex(index);
+      //   question.isTouched();
+      // } else {
+      //   question.isDoubleAnswered();
+      // }
       window.answerSheet = questions;
     },
   },

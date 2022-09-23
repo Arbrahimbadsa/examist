@@ -5,6 +5,7 @@ const positionSlice = createSlice({
     value: {
       scrollTop: 0,
     },
+    container: null,
   },
   reducers: {
     setScrollTop: (state, action) => {
@@ -13,8 +14,11 @@ const positionSlice = createSlice({
         scrollTop: action.payload,
       };
     },
+    setContainer: (state, action) => {
+      state.container = action.payload;
+    },
   },
 });
 
-export const { setScrollTop } = positionSlice.actions;
+export const { setScrollTop, setContainer } = positionSlice.actions;
 export default positionSlice.reducer;

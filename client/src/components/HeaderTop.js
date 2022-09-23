@@ -24,7 +24,9 @@ import { Dialog, DialogBody } from "./Dialog";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
 import { setQuestions } from "../redux/reducers/examSlice";
-import { genQuestion } from "../utils/questions";
+import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
+import axios from "axios";
+import QuestionModel from "../utils/classes/QuestionModel";
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -163,6 +165,9 @@ const Switcher = () => {
 export default function HeaderTop() {
   const dispatcher = useDispatch();
   const isExamStarted = useSelector((state) => state.isExamStarted.value);
+  const isGeneratingQuestion = useSelector(
+    (state) => state.loading.isGeneratingQuestion
+  );
   const [categories] = useState([
     {
       label: "New",
@@ -188,7 +193,14 @@ export default function HeaderTop() {
   const [activeCategory, setActiveCategory] = useState(0);
   const [userMenu, setUserMenu] = useState(false);
   const [newExam, setNewExam] = useState(false);
-  const handleNewExam = () => !isExamStarted && setNewExam(!newExam);
+  const handleNewExam = () =>
+    !isExamStarted && setNewExam(!newExam) && !isGeneratingQuestion;
+  const goHome = () => {
+    dispatcher(disableContent(false));
+    dispatcher(setContentIndex(0));
+    window.answerSheet = null;
+    window.onbeforeunload = () => {};
+  };
   return (
     <>
       {/* Category dialogues */}
@@ -196,11 +208,26 @@ export default function HeaderTop() {
         <Dialog show={newExam} title="Start a new exam" onClose={handleNewExam}>
           <DialogBody>
             <button
-              onClick={() => {
+              onClick={async () => {
                 dispatcher(setContentIndex(50));
                 setNewExam(false);
                 dispatcher(disableContent(true));
-                dispatcher(setQuestions(genQuestion(10)));
+                dispatcher(setIsGeneratingQuestion(true));
+                const { data } = await axios.get(
+                  "https://6318e3896b4c78d91b31ae8b.mockapi.io/api/v1/questions"
+                );
+                const qs = data.map(
+                  (d) =>
+                    new QuestionModel(
+                      d.id,
+                      null,
+                      d.label,
+                      d.options,
+                      d.correctAnswer
+                    )
+                );
+                dispatcher(setQuestions(qs));
+                dispatcher(setIsGeneratingQuestion(false));
               }}
             >
               Start a quick exam
@@ -222,8 +249,8 @@ export default function HeaderTop() {
               >
                 <Humbarger size={25} />
               </IconHolder>
-              <Logo dim={35} phone />
-              <TitleOnPhone>Flame</TitleOnPhone>
+              <Logo onClick={goHome} dim={35} phone />
+              <TitleOnPhone onClick={goHome}>Flame</TitleOnPhone>
             </MetaHolderOnPhone>
           </HeaderOnPhoneHolder>
           {categories &&

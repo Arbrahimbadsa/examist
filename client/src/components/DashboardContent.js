@@ -18,12 +18,14 @@ export default function DashboardContent() {
   return (
     <DashboardContentHolder theme={theme}>
       <HeaderTop />
-      <DashboardContantContainer>
-        {contentIndex === 0 && <DashboardMainContent />}
-        {contentIndex === 1 && <h1>Hello I am exams.</h1>}
-        {contentIndex === 2 && <h1>Hello I am performance.</h1>}
-        {contentIndex === 50 && <ExamPage />}
-      </DashboardContantContainer>
+      {contentIndex === 50 && <ExamPage />}
+      {contentIndex !== 50 && (
+        <DashboardContantContainer>
+          {contentIndex === 0 && <DashboardMainContent />}
+          {contentIndex === 1 && <h1>Hello I am exams.</h1>}
+          {contentIndex === 2 && <h1>Hello I am performance.</h1>}
+        </DashboardContantContainer>
+      )}
     </DashboardContentHolder>
   );
 }

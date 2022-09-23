@@ -6,7 +6,10 @@ const contentIndexSlice = createSlice({
   },
   reducers: {
     setContentIndex: (state, action) => {
-      localStorage.setItem("contentIndex", action.payload);
+      const notToSave = [50];
+      if (notToSave.indexOf(action.payload) < 0) {
+        localStorage.setItem("contentIndex", action.payload);
+      }
       state.value = action.payload;
     },
     updateContentIndex: (state) => {

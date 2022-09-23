@@ -102,13 +102,10 @@ export const genQuestion = (count) => {
       Math.floor(Math.random() * 100),
     ];
     const question = new QuestionModel(
-      `What is the value of ${num1} + ${num2} ?`,
-      options,
-      3,
-      null,
-      false,
+      i + 1,
       `some-id-${i}`,
-      i + 1
+      `What is the value of ${num1} + ${num2} ?`,
+      options
     );
     set_threee.push(question);
   }

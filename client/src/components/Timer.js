@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
 import styled from "styled-components";
+import { Clock } from "react-feather";
 const TimerHolder = styled.div`
   font-family: "Poppins", sans-serif;
   font-size: 18px;
@@ -14,13 +15,16 @@ const TimerHolder = styled.div`
 `;
 const TimerTextHodlder = styled.div`
   height: 45px;
-  width: 200px;
+  width: auto;
   padding: 10px 20px;
   background: #13b2ec;
   color: #fff;
   border-radius: 5px;
   position: relative;
   z-index: 1000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   @media only screen and (max-width: 600px) {
     width: 100%;
   }
@@ -54,8 +58,11 @@ export default function Timer({ expiryTimestamp, onExpire }) {
   return (
     <TimerHolder>
       <TimerTextHodlder>
-        Time left : {hr !== "00" ? hr + ":" : null}
-        {min}:{sec}
+        <Clock style={{ marginRight: "5px" }} size={20} />
+        <p>
+          Time left : {hr !== "00" ? hr + ":" : null}
+          {min}:{sec}
+        </p>
       </TimerTextHodlder>
     </TimerHolder>
   );
