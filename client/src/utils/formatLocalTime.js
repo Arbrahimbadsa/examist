@@ -8,8 +8,8 @@ export default function formatLocalTime(timeString) {
     const time = timeArr.join(":") + " " + arr[1];
     return time;
   } else {
-    const ampm = timeArr[0] > 12 ? "PM" : "AM";
-    const hr = timeArr[0] % 12;
+    const ampm = timeArr[0] >= 12 ? "PM" : "AM";
+    const hr = timeArr[0] % 12 === 0 ? 12 : timeArr[0] % 12;
     const min = timeArr[1];
     return `${hr}:${min} ${ampm}`;
   }
