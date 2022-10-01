@@ -105,7 +105,8 @@ export const genQuestion = (count) => {
       i + 1,
       `some-id-${i}`,
       `What is the value of ${num1} + ${num2} ?`,
-      options
+      options,
+      3
     );
     set_threee.push(question);
   }

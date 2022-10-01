@@ -1,8 +1,8 @@
 import { X } from "react-feather";
 import styled from "styled-components";
 const DialogBoxContainer = styled.div`
-  height: ${(props) => (props.small ? "auto" : "50vh")};
-  width: ${(props) => (props.small ? "400px" : "50vw")};
+  height: ${(props) => (props.small ? "auto" : "400px")};
+  width: ${(props) => (props.small ? "400px" : "900px")};
   background: #fff;
   border-radius: 10px;
   padding: 20px;
@@ -12,6 +12,10 @@ const DialogBoxContainer = styled.div`
   transform: translate(-50%, -50%);
   position: absolute;
   z-index: 999999999999999;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
   font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
     height: ${(props) => (props.small ? "auto" : "100vh")};
@@ -46,13 +50,21 @@ const Backdrop = styled.div`
   width: 100vw;
 `;
 const DialogBodyContainer = styled.div`
-  padding: 5px 0;
+  padding-top: 8px;
+  ${(props) =>
+    props.center &&
+    `
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+  `}
 `;
 export function DialogHeader({ children }) {
   return <DialogHeaderContainer>{children}</DialogHeaderContainer>;
 }
-export function DialogBody({ children }) {
-  return <DialogBodyContainer>{children}</DialogBodyContainer>;
+export function DialogBody({ children, ...rest }) {
+  return <DialogBodyContainer {...rest}>{children}</DialogBodyContainer>;
 }
 export function Dialog({ children, show, title, onClose, small }) {
   return (

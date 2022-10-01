@@ -17,6 +17,8 @@ import GoTop from "./GoTop";
 import formatLocalTime from "../utils/formatLocalTime";
 import { Check, Clock, List, Slash, Target, X } from "react-feather";
 import { Dialog, DialogBody } from "./Dialog";
+import { useNavigate } from "react-router-dom";
+
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
   font-family: "Poppins", sans-serif;
@@ -74,6 +76,7 @@ const ExitButton = styled.div`
   @media only screen and (max-width: 600px) {
     margin-top: 15px;
     width: 100%;
+    cursor: default;
   }
 `;
 const MetaHolder = styled.div`
@@ -100,6 +103,9 @@ const SubmitButton = styled.div`
   border-radius: 5px;
   cursor: pointer;
   margin: 10px 0;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const LoadingHolder = styled.div`
   height: 100%;
@@ -139,6 +145,9 @@ const DialogSubmitButton = styled.button`
   margin: 15px 0 0 0;
   cursor: pointer;
   border-radius: 5px;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const Info = styled.div`
   display: flex;
@@ -164,6 +173,7 @@ const ObtainedText = styled.p`
 `;
 
 export default function ExamPage() {
+  const navigate = useNavigate();
   // timer
   const examTime = 15; // in min
   const time = new Date();
@@ -179,6 +189,7 @@ export default function ExamPage() {
 
   // states (redux)
   const { questions } = useSelector((state) => state.exam.value);
+  const examId = useSelector((state) => state.exam.examId);
   const isGeneratingQuestion = useSelector(
     (state) => state.loading.isGeneratingQuestion
   );
@@ -201,6 +212,7 @@ export default function ExamPage() {
   };
 
   const handleConfirmSubmit = () => {
+    navigate("answer-sheet/" + examId);
     window.onbeforeunload = () => {};
     console.log(window.answerSheet);
     setAreYouSure(false);
@@ -217,6 +229,7 @@ export default function ExamPage() {
     dispatcher(setContentIndex(0));
     window.answerSheet = null;
     window.onbeforeunload = () => {};
+    navigate("/dashboard");
   };
 
   // effects

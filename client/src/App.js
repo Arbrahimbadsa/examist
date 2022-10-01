@@ -9,6 +9,7 @@ function App() {
     <Routes>
       <Route exact path="/" element={<HomeScreen />} />
       <Route path="dashboard" element={<HomeScreen />} />
+      <Route path="dashboard/*" element={<HomeScreen />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegistrationPage />} />
       <Route path="*" element={<NotFoundPage />} />

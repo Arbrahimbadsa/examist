@@ -14,6 +14,7 @@ import { useRef } from "react";
 import { setShowSidebar } from "../redux/reducers/sidebarSlice";
 import { useLayoutEffect } from "react";
 import useDim from "../hooks/useDim";
+import { useNavigate } from "react-router-dom";
 
 const SidebarHolder = styled.div`
   background: ${(props) => props.theme.sidebarBg};
@@ -27,8 +28,8 @@ const SidebarHolder = styled.div`
   @media only screen and (max-width: 600px) {
     transition: 0.2s;
     position: absolute;
-    left: -220px;
-    z-index: 999 !important;
+    transform: translate(-220px, 0);
+    z-index: 99999999 !important;
   }
 `;
 const SidebarHider = styled.div`
@@ -66,6 +67,9 @@ const SidebarItemHolder = styled.div`
     `&:hover {
     background: #888888;
   }`}
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const SidebarItemText = styled.p`
   margin-left: 8px;
@@ -79,6 +83,12 @@ const Backdrop = styled.div`
   width: 100vw;
   display: ${(props) => (props.show ? "block" : "none")};
   z-index: 998 !important;
+`;
+const FlameText = styled.span`
+  cursor: pointer;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 
 const SidebarItem = ({ label, icon, active, onClick }) => {
@@ -98,11 +108,16 @@ export default function Sidebar() {
   const theme = useTheme("dashboard");
   const contentIndex = useContentIndex();
   const dispatcher = useDispatch();
+  const navigate = useNavigate();
   const isPc = useDim();
   const [items] = useState([
-    { label: "Dashboard", icon: <Grid size={20} /> },
-    { label: "Exams", icon: <Edit2 size={20} /> },
-    { label: "Performance", icon: <BarChart size={18} /> },
+    { label: "Dashboard", icon: <Grid size={20} />, route: "/dashboard" },
+    { label: "Exams", icon: <Edit2 size={20} />, route: "exams" },
+    {
+      label: "Performance",
+      icon: <BarChart size={18} />,
+      route: "performance",
+    },
   ]);
   const handleItemClick = (id) => {
     if (!isExamStarted) {
@@ -117,9 +132,9 @@ export default function Sidebar() {
     if (!isPc) {
       if (showSidebar !== null) {
         if (showSidebar === true) {
-          sidebarRef.current.style.left = "0";
+          sidebarRef.current.style.transform = "translate(0px, 0)";
         } else {
-          sidebarRef.current.style.left = "-220px";
+          sidebarRef.current.style.transform = "translate(-220px, 0)";
         }
       }
     }
@@ -135,7 +150,7 @@ export default function Sidebar() {
         <SidebarHeader>
           <SidebarHeaderText>
             <Logo dim={40} />
-            Flame
+            <FlameText onClick={() => navigate("/dashboard")}>Flame</FlameText>
           </SidebarHeaderText>
         </SidebarHeader>
         <SidebarItemsHolder>
@@ -146,7 +161,10 @@ export default function Sidebar() {
                 icon={item.icon}
                 key={i}
                 active={i === contentIndex}
-                onClick={() => handleItemClick(i)}
+                onClick={() => {
+                  handleItemClick(i);
+                  navigate(item.route);
+                }}
               />
             ))}
         </SidebarItemsHolder>

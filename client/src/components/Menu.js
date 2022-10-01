@@ -40,6 +40,8 @@ const MenuItemHolder = styled.div`
   width: 100%;
   padding: 10px;
   cursor: pointer;
+  font-size: 15px;
+  border-bottom: 1px solid #eee;
   &:hover {
     opacity: 0.3;
   }

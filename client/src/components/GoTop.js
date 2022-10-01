@@ -14,6 +14,9 @@ const GoTopHolder = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 export default function GoTop({ elem }) {
   const [show, setShow] = useState(false);

@@ -11,6 +11,9 @@ import {
   Sun,
   Menu as Humbarger,
   Users,
+  Settings as SettingsIcon,
+  Bookmark,
+  LogOut,
 } from "react-feather";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,13 +23,10 @@ import { logout } from "../redux/reducers/userSlice";
 import Logo from "./Logo";
 import { setShowSidebar } from "../redux/reducers/sidebarSlice";
 import IconButton from "./IconButton";
-import { Dialog, DialogBody } from "./Dialog";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
-import { setQuestions } from "../redux/reducers/examSlice";
-import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
-import axios from "axios";
-import QuestionModel from "../utils/classes/QuestionModel";
+import NewExamDialog from "./NewExamDialog";
+import { useNavigate } from "react-router-dom";
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -97,6 +97,9 @@ const HeaderUserInfoHolder = styled.div`
   &:hover {
     ${(props) => (props.clickable ? `opacity: 0.5;` : null)}
   }
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const CategoryHolder = styled.div`
   color: ${(props) => (props.active ? "#13b2ec" : "")};
@@ -114,6 +117,7 @@ const CategoryHolder = styled.div`
   }`}
   @media only screen and (max-width: 600px) {
     display: none;
+    cursor: default;
   }
 `;
 const CategoryLabel = styled.p`
@@ -139,6 +143,10 @@ const TitleOnPhone = styled.p`
 const IconHolder = styled.div`
   ${(props) => (props.clickable ? `cursor: pointer;` : ``)}
   display: flex;
+`;
+const Flex = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const Category = ({ label, icon, active, onClick }) => {
@@ -172,27 +180,33 @@ export default function HeaderTop() {
     {
       label: "New",
       icon: <Plus size={15} />,
+      route: "new-exam",
     },
     {
       label: "Leaderboard",
       icon: <Users size={15} />,
+      route: "leaderboard",
     },
     {
       label: "Analytics",
       icon: <PieChart size={15} />,
+      route: "analytics",
     },
     {
       label: "Settings",
       icon: <Settings size={15} />,
+      route: "settings",
     },
     {
       label: "Info",
       icon: <Info size={15} />,
+      route: "info",
     },
   ]);
   const [activeCategory, setActiveCategory] = useState(0);
   const [userMenu, setUserMenu] = useState(false);
   const [newExam, setNewExam] = useState(false);
+  const navigate = useNavigate();
   const handleNewExam = () =>
     !isExamStarted && setNewExam(!newExam) && !isGeneratingQuestion;
   const goHome = () => {
@@ -200,40 +214,20 @@ export default function HeaderTop() {
     dispatcher(setContentIndex(0));
     window.answerSheet = null;
     window.onbeforeunload = () => {};
+    navigate("/dashboard");
   };
   return (
     <>
       {/* Category dialogues */}
       {activeCategory === 0 && (
-        <Dialog show={newExam} title="Start a new exam" onClose={handleNewExam}>
-          <DialogBody>
-            <button
-              onClick={async () => {
-                dispatcher(setContentIndex(50));
-                setNewExam(false);
-                dispatcher(disableContent(true));
-                dispatcher(setIsGeneratingQuestion(true));
-                const { data } = await axios.get(
-                  "https://6318e3896b4c78d91b31ae8b.mockapi.io/api/v1/questions"
-                );
-                const qs = data.map(
-                  (d) =>
-                    new QuestionModel(
-                      d.id,
-                      null,
-                      d.label,
-                      d.options,
-                      d.correctAnswer
-                    )
-                );
-                dispatcher(setQuestions(qs));
-                dispatcher(setIsGeneratingQuestion(false));
-              }}
-            >
-              Start a quick exam
-            </button>
-          </DialogBody>
-        </Dialog>
+        <NewExamDialog
+          show={newExam}
+          onClose={() => {
+            handleNewExam();
+            navigate("/dashboard");
+          }}
+          setNewExam={setNewExam}
+        />
       )}
       {/* ------------------- */}
       <HeaderTopHolder>
@@ -263,6 +257,7 @@ export default function HeaderTop() {
                 onClick={() => {
                   if (!isExamStarted) {
                     setActiveCategory(i);
+                    navigate(category.route);
                     if (i === 0) setNewExam(!newExam);
                   }
                 }}
@@ -295,16 +290,34 @@ export default function HeaderTop() {
             show={userMenu}
             onClose={() => setUserMenu(false)}
           >
-            <MenuItem>Points</MenuItem>
-            <MenuItem>Upgrade</MenuItem>
-            <MenuItem>Settings</MenuItem>
+            <MenuItem>
+              <Flex>
+                <Plus style={{ marginRight: "5px" }} size={15} />
+                Add Questions
+              </Flex>
+            </MenuItem>
+            <MenuItem>
+              <Flex>
+                <Bookmark style={{ marginRight: "5px" }} size={15} />
+                Bookmarked
+              </Flex>
+            </MenuItem>
+            <MenuItem>
+              <Flex>
+                <SettingsIcon style={{ marginRight: "5px" }} size={15} />
+                Settings
+              </Flex>
+            </MenuItem>
             <MenuItem
               onItemClick={() => {
                 setUserMenu(false);
                 dispatcher(logout());
               }}
             >
-              Logout
+              <Flex>
+                <LogOut style={{ marginRight: "5px" }} size={15} />
+                Logout
+              </Flex>
             </MenuItem>
           </Menu>
         </HeaderTopRight>

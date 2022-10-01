@@ -12,6 +12,9 @@ const IconButtonHolder = styled.div`
   &:hover {
     ${(props) => (props.clickable ? `opacity: 0.5` : null)}
   }
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 
 export default function IconButton({ children, margin, ...rest }) {

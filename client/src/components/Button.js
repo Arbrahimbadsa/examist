@@ -10,6 +10,9 @@ const StyledButton = styled.button`
   color: #fff;
   margin-bottom: 10px;
   display: block;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 export default function Button({ children, ...rest }) {
   const theme = useTheme();

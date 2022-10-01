@@ -19,6 +19,7 @@ const Container = styled.div`
   width: 100vw;
   padding: 1rem;
   background: #ebeef6;
+  overflow-y: scroll;
   font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
     padding: 0;

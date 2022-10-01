@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from "uuid";
 const examSlice = createSlice({
   name: "exam",
   initialState: {
     value: {
       questions: [],
     },
+    examId: uuidv4(),
   },
   reducers: {
     setQuestions: (state, action) => {

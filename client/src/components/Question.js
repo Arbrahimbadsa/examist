@@ -44,7 +44,7 @@ const OptionCount = styled.div`
     props.selectedCorrect
       ? "green"
       : props.selectedInCorrect
-      ? "red"
+      ? "#FF0400"
       : props.theme.optionColor};
   ${(props) =>
     !props.touched &&
@@ -53,6 +53,9 @@ const OptionCount = styled.div`
   cursor: pointer;
   }`}
   ${(props) => (props.selected ? "background:  #94A6B8; color: #fff;" : null)}
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const DashboardOptionCount = styled.div`
   margin: 0 10px 0 0;
@@ -78,6 +81,9 @@ const DashboardOptionCount = styled.div`
   cursor: pointer;
   }`}
   ${(props) => props.changeCorrectBg && `background: #26D95F; color: #fff;`}
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const OptionTextWrapper = styled.div``;
 export function QuestionOption({

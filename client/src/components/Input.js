@@ -16,7 +16,7 @@ const StyledInput = styled.input`
   }
 `;
 const InputHolder = styled.div`
-  margin: 20px 0;
+  margin: ${(props) => (props.margin ? props.margin : "20px 0")};
 `;
 const Label = styled.label`
   color: ${(props) => props.theme.loginPage.text};
@@ -26,7 +26,7 @@ const Label = styled.label`
 export default function Input({ label, ...rest }) {
   const theme = useTheme();
   return (
-    <InputHolder>
+    <InputHolder margin={rest.margin}>
       <Label theme={theme} htmlFor={"flame-" + rest.id}>
         {label}
       </Label>
