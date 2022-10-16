@@ -112,7 +112,7 @@ export default function Sidebar() {
   const isPc = useDim();
   const [items] = useState([
     { label: "Dashboard", icon: <Grid size={20} />, route: "/dashboard" },
-    { label: "Exams", icon: <Edit2 size={20} />, route: "exams" },
+    { label: "Past Exams", icon: <Edit2 size={20} />, route: "past-exams" },
     {
       label: "Performance",
       icon: <BarChart size={18} />,

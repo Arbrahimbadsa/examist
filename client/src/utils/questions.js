@@ -48,6 +48,8 @@ export const questions = [
 
 export const set_two = [
   new QuestionModel(
+    1,
+    "question-id-1",
     String.raw`Calculate the value of -  $**\int ^{\infty }_{0}\dfrac{xdx}{1+x^{4}}**$ and this would render and if $*x = 5*$ then find the value of this. $**(x+y) / 3 = 5**$`,
     [
       String.raw`$**\int ^{\infty }_{0}\dfrac{xdx}{1+x^{4}}**$`,
@@ -55,38 +57,19 @@ export const set_two = [
       30,
       String.raw`$**\int ^{\infty }_{0}\dfrac{xdx}{1+x^{4}}**$`,
     ],
-    4,
-    null,
-    false,
-    "this-is-some-id",
     1
   ),
   new QuestionModel(
-    "What is the value of 5 + 3?",
-    [10, 25, 30, 8],
-    4,
-    null,
-    false,
-    "this-is-some-id1",
-    2
-  ),
-  new QuestionModel(
-    "What is the value of 3 + 8?",
-    [10, 25, 11, 6],
-    3,
-    null,
-    false,
-    "this-is-some-id2",
-    3
-  ),
-  new QuestionModel(
-    "What is the value of 3 + 7?",
-    [10, 25, 30, 6],
-    1,
-    null,
-    false,
-    "this-is-some-id3",
-    4
+    2,
+    "id-2",
+    String.raw`If $*x^{2}-25=0*$ then find the value of $*x*$`,
+    [
+      String.raw`$*+5, -5*$`,
+      String.raw`$*0*$`,
+      String.raw`$*6, -3*$`,
+      String.raw`$*+2*$`,
+    ],
+    1
   ),
 ];
 

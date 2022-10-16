@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
 import styled from "styled-components";
@@ -38,7 +39,6 @@ const OptionsHolder = styled.div`
   top: 100%;
   width: 100%;
   background: #fff;
-  padding: 16px;
   margin: 10px 0;
   max-height: 120px;
   overflow-y: scroll;
@@ -47,13 +47,13 @@ const OptionsHolder = styled.div`
     0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
 `;
 const Option = styled.div`
-  padding: 8px 0;
+  padding: 12px 0 12px 16px;
   color: grey;
   font-size: 14.5px;
   &:hover {
     opacity: 0.5;
   }
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e8e8e8;
 `;
 const Backdrop = styled.div`
   height: 100%;
@@ -64,20 +64,86 @@ const Backdrop = styled.div`
   z-index: 230;
   cursor: default;
 `;
+const OptionChipsHolder = styled.div`
+  width: 100%;
+  overflow-x: scroll;
+  margin-right: 10px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+const OptionChipsHolderMain = styled.div`
+  width: ${(props) => props.width && props.width};
+  display: flex;
+`;
+const Chip = styled.div`
+  padding: 0 5px;
+  background: grey;
+  color: #fff;
+  width: auto;
+  margin-right: 5px;
+  border-radius: 3px;
+  cursor: pointer !important;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
+`;
 
-export default function Select({ label, options, ...rest }) {
-  const [selectedOption, setSelectedOption] = useState("Select one");
+export default function Select({
+  label,
+  options,
+  onChange,
+  selected,
+  multipleChoice,
+  ...rest
+}) {
   const [showOptions, setShowOptions] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const handleOptionsShow = () => setShowOptions(!showOptions);
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
+  const handleOptionClick = (option) => {
+    if (!multipleChoice) {
+      onChange(option);
+    } else {
+      const found = selectedOptions.indexOf(option) > -1;
+      if (found) {
+        const copy = [...selectedOptions];
+        const index = selectedOptions.indexOf(option);
+        copy.splice(index, 1);
+        setSelectedOptions(copy);
+        onChange(copy);
+      } else {
+        setSelectedOptions([...selectedOptions, option]);
+        onChange([...selectedOptions, option]);
+      }
+    }
   };
+  useEffect(() => {
+    if (selected.length === 0) setSelectedOptions([]);
+  }, [selected]);
   return (
     <SelectHolder {...rest}>
       <Label>{label}</Label>
       <StyledSelect onClick={handleOptionsShow}>
         <DefaultTextHolder>
-          <p>{selectedOption}</p>
+          {multipleChoice ? (
+            <OptionChipsHolder>
+              <OptionChipsHolderMain
+                width={`calc(180px * ${options && options.length})`}
+              >
+                <p>
+                  {selected.length === 0 &&
+                    (rest.loading ? "Loading..." : "Select One")}
+                </p>
+                {selected.map((item, i) => (
+                  <Chip key={i}>{item}</Chip>
+                ))}
+              </OptionChipsHolderMain>
+            </OptionChipsHolder>
+          ) : (
+            <p>
+              {selected ? selected : rest.loading ? "Loading..." : "Select One"}
+            </p>
+          )}
           {showOptions ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         </DefaultTextHolder>
         {showOptions && <Backdrop onClick={() => setShowOptions(false)} />}
@@ -85,7 +151,7 @@ export default function Select({ label, options, ...rest }) {
           <OptionsHolder>
             {options &&
               options.map((option, i) => (
-                <Option key={i} onClick={() => handleOptionSelect(option)}>
+                <Option key={i} onClick={() => handleOptionClick(option)}>
                   {option}
                 </Option>
               ))}

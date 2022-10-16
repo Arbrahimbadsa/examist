@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled from "styled-components";
 const CheckBoxHolder = styled.div`
   display: flex;
@@ -12,12 +13,21 @@ const Check = styled.input`
 const Label = styled.label`
   color: grey;
   font-size: 14px;
+  cursor: pointer;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
-export default function CheckBox({ label }) {
+export default function CheckBox({ label, checked, onClick }) {
   return (
     <CheckBoxHolder>
-      <Check type="checkbox" />
-      <Label>{label}</Label>
+      <Check
+        checked={checked}
+        onClick={onClick}
+        onChange={onClick}
+        type="checkbox"
+      />
+      <Label onClick={onClick}>{label}</Label>
     </CheckBoxHolder>
   );
 }

@@ -8,6 +8,7 @@ import disableContentSlice from "./disableContentSlice";
 import examSlice from "./examSlice";
 import positionSlice from "./positionSlice";
 import loadingSlice from "./loadingSlice";
+import pastExamSlice from "./pastExamSlice";
 const rootReducer = {
   counter: testSlice,
   user: userSlice,
@@ -19,5 +20,6 @@ const rootReducer = {
   exam: examSlice,
   position: positionSlice,
   loading: loadingSlice,
+  pastExams: pastExamSlice,
 };
 export default rootReducer;

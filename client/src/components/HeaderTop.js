@@ -14,6 +14,7 @@ import {
   Settings as SettingsIcon,
   Bookmark,
   LogOut,
+  Bell,
 } from "react-feather";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,7 +34,9 @@ const HeaderTopHolder = styled.div`
   user-select: none;
   min-height: 55px;
   padding: 0 25px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  z-index: 99;
+  box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
   font-family: "Poppins", sans-serif;
   position: relative;
   @media only screen and (max-width: 600px) {
@@ -143,10 +146,24 @@ const TitleOnPhone = styled.p`
 const IconHolder = styled.div`
   ${(props) => (props.clickable ? `cursor: pointer;` : ``)}
   display: flex;
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
 `;
 const Flex = styled.div`
   display: flex;
   align-items: center;
+`;
+const RedDot = styled.div`
+  height: 12px;
+  width: 12px;
+  background: red;
+  position: absolute;
+  right: 5px;
+  top: 1.5px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: ${(props) => (props.show ? "block" : "none")};
 `;
 
 const Category = ({ label, icon, active, onClick }) => {
@@ -166,6 +183,15 @@ const Switcher = () => {
     <IconButton onClick={() => !isExamStarted && dispatcher(switchTheme())}>
       {mode === "light" && <Moon size={20} />}
       {mode === "dark" && <Sun size={20} />}
+    </IconButton>
+  );
+};
+
+const Notification = ({ isNew }) => {
+  return (
+    <IconButton style={{ position: "relative" }}>
+      <Bell color="black" size={20} />
+      <RedDot show={isNew} />
     </IconButton>
   );
 };
@@ -265,6 +291,7 @@ export default function HeaderTop() {
             ))}
         </HeaderTopLeft>
         <HeaderTopRight>
+          <Notification isNew={true} />
           <IconButton onClick={handleNewExam} margin="0">
             <Plus color="black" size={20} />
           </IconButton>

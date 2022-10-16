@@ -31,19 +31,18 @@ export default function DashboardMainContent() {
         <PageIconHolder>
           <Home size={15} />
         </PageIconHolder>
-        <p>Dashboard</p>
+        <h3>Dashboard</h3>
       </PageTitle>
       <MainContent>
         <QuickPractice />
+        <Card centered={true}>
+          <CardHeader title="Challenges" />
+        </Card>
         <Card centered={true}>
           <CardHeader title="Analytics" />
           <CardContent>
             <DashboardAnalytics />
           </CardContent>
-        </Card>
-        <Card centered={true}>
-          <CardHeader title="Challenges" />
-          <DashboardAnalytics />
         </Card>
       </MainContent>
     </>

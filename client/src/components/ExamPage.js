@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useContentIndex from "../hooks/useContentIndex";
 import { disableContent } from "../redux/reducers/disableContentSlice";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
+import IconButton from "./IconButton";
 import {
   Question,
   QuestionLabel,
@@ -12,12 +13,25 @@ import {
   QuestionOptions,
 } from "./Question";
 import RenderLatex from "./RenderLatex";
-import { setSelectedIndex } from "../redux/reducers/examSlice";
+import {
+  clearNewExamInputs,
+  setSelectedIndex,
+} from "../redux/reducers/examSlice";
 import GoTop from "./GoTop";
 import formatLocalTime from "../utils/formatLocalTime";
-import { Check, Clock, List, Slash, Target, X } from "react-feather";
+import {
+  ArrowLeft,
+  Bookmark,
+  Check,
+  Clock,
+  List,
+  Slash,
+  Target,
+  X,
+} from "react-feather";
 import { Dialog, DialogBody } from "./Dialog";
 import { useNavigate } from "react-router-dom";
+import GreyText from "./GreyText";
 
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
@@ -34,7 +48,8 @@ const QuestionWrapper = styled.div`
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
 `;
 const QuestionCountHolder = styled.div`
   font-family: "Poppins", sans-serif;
@@ -52,7 +67,8 @@ const ExamHeaderHolder = styled.div`
   text-align: center;
   margin-bottom: 20px;
   border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
+    0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
 `;
 const TimerAndExitHolder = styled.div`
   display: flex;
@@ -166,16 +182,34 @@ const CountAndCorrect = styled.div`
 `;
 const CorrectText = styled.p`
   color: ${(props) => (props.correct ? "#26d95f" : "red")};
+  font-size: 12px;
 `;
 const ObtainedText = styled.p`
   color: #a4b8ca;
   font-size: 14px;
 `;
+const Flex = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: ${(props) => (props.showCursor ? "pointer" : "default")};
+  @media only screen and (max-width: 600px) {
+    cursor: default;
+  }
+`;
 
 export default function ExamPage() {
   const navigate = useNavigate();
+
+  // states (redux)
+  const examTime = useSelector((state) => state.exam.examTime);
+  const questions = useSelector((state) => state.exam.questions);
+  const examId = useSelector((state) => state.exam.examId);
+  const isGeneratingQuestion = useSelector(
+    (state) => state.loading.isGeneratingQuestion
+  );
+
   // timer
-  const examTime = 15; // in min
   const time = new Date();
   time.setSeconds(time.getSeconds() + examTime * 60);
 
@@ -186,13 +220,6 @@ export default function ExamPage() {
 
   // dispatcher
   const dispatcher = useDispatch();
-
-  // states (redux)
-  const { questions } = useSelector((state) => state.exam.value);
-  const examId = useSelector((state) => state.exam.examId);
-  const isGeneratingQuestion = useSelector(
-    (state) => state.loading.isGeneratingQuestion
-  );
 
   // states (pure)
   const [areYouSure, setAreYouSure] = useState(false);
@@ -230,6 +257,7 @@ export default function ExamPage() {
     window.answerSheet = null;
     window.onbeforeunload = () => {};
     navigate("/dashboard");
+    dispatcher(clearNewExamInputs());
   };
 
   // effects
@@ -300,7 +328,7 @@ export default function ExamPage() {
                 <TimerAndExitHolder>
                   <Timer
                     expiryTimestamp={time}
-                    onExpire={() => alert("Ok done!")}
+                    onExpire={handleConfirmSubmit}
                   />
                   <ExitButton onClick={resetToHomePage}>Exit</ExitButton>
                 </TimerAndExitHolder>
@@ -381,7 +409,17 @@ export default function ExamPage() {
                     </ExamInfo>
                   </ExamInfoHolder>
                 </ExamHeaderHolder>
-                <h3>Answersheet ({questions.length})</h3>
+                <Flex>
+                  <h3>Answersheet ({questions.length})</h3>
+                  <Flex showCursor={true} onClick={resetToHomePage}>
+                    <ArrowLeft
+                      color="grey"
+                      style={{ marginRight: "5px" }}
+                      size={15}
+                    />
+                    <GreyText>Back to home</GreyText>
+                  </Flex>
+                </Flex>
                 <QuestionsHolder>
                   {window.answerSheet &&
                     window.answerSheet.map((question, i) => (
@@ -399,8 +437,13 @@ export default function ExamPage() {
                                 : "Incorrect"}
                             </CorrectText>
                           ) : (
-                            <p style={{ color: "#a4b8ca" }}>Skipped</p>
+                            <p style={{ color: "#a4b8ca", fontSize: "12px" }}>
+                              Skipped
+                            </p>
                           )}
+                          <IconButton>
+                            <Bookmark size={20} color="#000" />
+                          </IconButton>
                         </CountAndCorrect>
                         <Question>
                           <QuestionLabel>
