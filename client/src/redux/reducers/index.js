@@ -1,4 +1,3 @@
-import testSlice from "./testSlice";
 import userSlice from "./userSlice";
 import themeSlice from "./themeSlice";
 import contentIndexSlice from "./contentIndexSlice";
@@ -9,8 +8,8 @@ import examSlice from "./examSlice";
 import positionSlice from "./positionSlice";
 import loadingSlice from "./loadingSlice";
 import pastExamSlice from "./pastExamSlice";
+import examCountSlice from "./examCountSlice";
 const rootReducer = {
-  counter: testSlice,
   user: userSlice,
   theme: themeSlice,
   contentIndex: contentIndexSlice,
@@ -21,5 +20,6 @@ const rootReducer = {
   position: positionSlice,
   loading: loadingSlice,
   pastExams: pastExamSlice,
+  examCount: examCountSlice,
 };
 export default rootReducer;

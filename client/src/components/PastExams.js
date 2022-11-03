@@ -13,7 +13,25 @@ import { Card, CardContent, CardHeader } from "./Card";
 import IconButton from "./IconButton";
 import { Menu, MenuItem } from "./Menu";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setContentIndex } from "../redux/reducers/contentIndexSlice";
+import {
+  setAnswerSheet,
+  setExamId,
+  setExamTime,
+  setIsCompleted,
+  setMarks,
+  setName,
+  setOnlyResult,
+  setQuestions,
+  setShowExamPage,
+} from "../redux/reducers/examSlice";
+import { disableContent } from "../redux/reducers/disableContentSlice";
+import { removePastExam } from "../redux/reducers/pastExamSlice";
+import {
+  setCustomExamCountD,
+  setQuickExamCountD,
+} from "../redux/reducers/examCountSlice";
 const PastExamsHolder = styled.div`
   font-family: "Poppins", sans-serif;
   overflow-y: scroll;
@@ -40,7 +58,7 @@ const ExamsCardHolder = styled.div`
   min-height: 200px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: baseline;
   @media only screen and (max-width: 600px) {
     align-items: center;
@@ -132,8 +150,45 @@ const Chip = styled.div`
   margin: 0 10px 10px 0;
   border-radius: 4px;
 `;
+const Info = styled.p`
+  font-size: 14px;
+  color: grey;
+`;
 const PastExamCard = ({ exam }) => {
   const [actionsMenu, setActionsMenu] = useState(false);
+  const dispatcher = useDispatch();
+  const handleViewResult = () => {
+    dispatcher(setContentIndex(50));
+    dispatcher(setShowExamPage(false));
+    dispatcher(setOnlyResult(true));
+    dispatcher(setAnswerSheet(exam.answerSheet));
+    dispatcher(disableContent(false));
+    dispatcher(setMarks(exam.marks));
+    dispatcher(setName(exam.name));
+    dispatcher(setQuestions(exam.questions));
+  };
+  const handleRetake = () => {
+    dispatcher(setContentIndex(50));
+    dispatcher(setExamId(exam.id));
+    dispatcher(setExamTime(parseInt(exam.time.is)));
+    dispatcher(setQuestions(exam.questions));
+    dispatcher(setIsCompleted(exam.isCompleted));
+    // if any of the questions are touched, simply make them touchable again.
+    exam &&
+      exam.questions.forEach((e) => {
+        e.touched = false;
+        e.selectedIndex = [];
+        e.doubleAnswered = false;
+      });
+  };
+  const handleDelete = () => {
+    dispatcher(removePastExam(exam.id));
+    if (exam.prefix === "Quick Exam") {
+      dispatcher(setQuickExamCountD());
+    } else {
+      dispatcher(setCustomExamCountD());
+    }
+  };
   return (
     <Card
       style={{
@@ -141,6 +196,7 @@ const PastExamCard = ({ exam }) => {
         height: "auto",
         position: "relative",
         marginBottom: "20px",
+        marginRight: "20px",
         minWidth: "350px",
       }}
       extraCss={`
@@ -175,13 +231,23 @@ const PastExamCard = ({ exam }) => {
               show={actionsMenu}
               onClose={() => setActionsMenu(false)}
             >
-              <MenuItem>
+              <MenuItem
+                onItemClick={() => {
+                  handleRetake();
+                  setActionsMenu(false);
+                }}
+              >
                 <Flex>
                   <Edit2 style={{ marginRight: "5px" }} size={15} />
                   Retake
                 </Flex>
               </MenuItem>
-              <MenuItem>
+              <MenuItem
+                onItemClick={() => {
+                  handleDelete();
+                  setActionsMenu(false);
+                }}
+              >
                 <Flex>
                   <Trash style={{ marginRight: "5px" }} size={15} />
                   Delete
@@ -239,8 +305,9 @@ const PastExamCard = ({ exam }) => {
           </ChipsHolder>
         </SubContent>
         <CardButtons>
-          {exam.isCompleted && <Button>Result</Button>}
-          <Button>View Question</Button>
+          {exam.isCompleted && (
+            <Button onClick={handleViewResult}>Result</Button>
+          )}
         </CardButtons>
       </CardContent>
     </Card>
@@ -257,10 +324,15 @@ export default function PastExams() {
         </PageIconHolder>
         <h3>Past Exams ({totalPastExams})</h3>
       </PageTitle>
-      <ExamsCardHolder>
-        {pastExams &&
-          pastExams.map((exam, i) => <PastExamCard key={i} exam={exam} />)}
-      </ExamsCardHolder>
+      {pastExams && pastExams.length !== 0 && (
+        <ExamsCardHolder>
+          {pastExams &&
+            pastExams.map((exam, i) => <PastExamCard key={i} exam={exam} />)}
+        </ExamsCardHolder>
+      )}
+      {pastExams && pastExams.length === 0 && (
+        <Info>Take an exam. Past exams are to be shown here.</Info>
+      )}
     </PastExamsHolder>
   );
 }

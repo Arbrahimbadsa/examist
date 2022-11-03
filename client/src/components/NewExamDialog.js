@@ -1,12 +1,11 @@
 import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
 import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
 import { Dialog, DialogBody } from "./Dialog";
 import { genQuestion, set_two } from "../utils/questions";
 import {
-  clearNewExamInputs,
   setChapters,
   setExamId,
   setExamTime,
@@ -24,7 +23,11 @@ import GreyText from "./GreyText";
 import { Info } from "react-feather";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useEffect } from "react";
+import {
+  setExamPrefix,
+  setQuickExamCount,
+} from "../redux/reducers/examCountSlice";
+import { setCustomExamCount } from "../redux/reducers/examCountSlice";
 
 const InputHolder = styled.div`
   display: flex;
@@ -85,10 +88,12 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     // set the exam inputs
     const examId = uuidv4();
     dispatcher(setExamId(examId));
-    dispatcher(setTotalQuestions(15));
+    dispatcher(setTotalQuestions(2));
     dispatcher(setExamTime(1));
     dispatcher(setIsNegAllowed(true));
     dispatcher(setQuestions(s));
+    dispatcher(setExamPrefix("Quick Exam"));
+    dispatcher(setQuickExamCount());
     navigate("quick-exams/" + examId); // show fake route
 
     dispatcher(setIsGeneratingQuestion(false)); // hide loader
@@ -113,6 +118,8 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     dispatcher(setSubjects(subjects));
     dispatcher(setChapters(chapters));
     dispatcher(setQuestions(s));
+    dispatcher(setExamPrefix("Custom Exam"));
+    dispatcher(setCustomExamCount());
     navigate("quick-exams/" + examId); // show fake route
 
     dispatcher(setIsGeneratingQuestion(false)); // hide loader

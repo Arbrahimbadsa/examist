@@ -15,7 +15,9 @@ import {
 import RenderLatex from "./RenderLatex";
 import {
   clearNewExamInputs,
+  setAnswerSheet,
   setSelectedIndex,
+  setShowExamPage,
 } from "../redux/reducers/examSlice";
 import GoTop from "./GoTop";
 import formatLocalTime from "../utils/formatLocalTime";
@@ -32,6 +34,8 @@ import {
 import { Dialog, DialogBody } from "./Dialog";
 import { useNavigate } from "react-router-dom";
 import GreyText from "./GreyText";
+import { setPastExams } from "../redux/reducers/pastExamSlice";
+import { getDate } from "../utils/getDate";
 
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
@@ -205,9 +209,25 @@ export default function ExamPage() {
   const examTime = useSelector((state) => state.exam.examTime);
   const questions = useSelector((state) => state.exam.questions);
   const examId = useSelector((state) => state.exam.examId);
+  const totalQuestions = useSelector((state) => state.exam.totalQuestions);
+  const isNegAllowed = useSelector((state) => state.exam.isNegAllowed);
+  const subjects = useSelector((state) => state.exam.subjects);
+  const examPrefix = useSelector((state) => state.examCount.prefix);
+  const quickExamCount = useSelector((state) => state.examCount.quickExamCount);
+  const customExamCount = useSelector(
+    (state) => state.examCount.customExamCount
+  );
+  const count = examPrefix === "Custom Exam" ? customExamCount : quickExamCount;
   const isGeneratingQuestion = useSelector(
     (state) => state.loading.isGeneratingQuestion
   );
+  const showExamPage = useSelector((state) => state.exam.showExamPage);
+  const showOnlyResult = useSelector((state) => state.exam.onlyResult);
+  const answerSheet = useSelector((state) => state.exam.answerSheet);
+  const onlyResult = useSelector((state) => state.exam.onlyResult);
+  const marks = useSelector((state) => state.exam.marks);
+  const name = useSelector((state) => state.exam.name);
+  const pastExams = useSelector((state) => state.pastExams.value);
 
   // timer
   const time = new Date();
@@ -223,7 +243,6 @@ export default function ExamPage() {
 
   // states (pure)
   const [areYouSure, setAreYouSure] = useState(false);
-  const [showExamPage, setShowExamPage] = useState(true);
   const [isExamSubmitting, setIsExamSubmitting] = useState(false);
   const abcd = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 
@@ -238,34 +257,89 @@ export default function ExamPage() {
     setAreYouSure(true);
   };
 
+  const is =
+    examTime === 60 ? "1 hr" : examTime > 60 ? "1+ hr" : examTime + " min";
+  const from = formatLocalTime(now.toLocaleTimeString());
+  const to = formatLocalTime(afterExam.toLocaleTimeString());
+  const on = getDate();
+
+  const addToPastExam = (completed) => {
+    const pastExam = {
+      id: examId,
+      name: `${examPrefix} - ${count}`,
+      questionsCount: totalQuestions,
+      isNegAllowed: isNegAllowed,
+      isCompleted: completed,
+      subjects: subjects,
+      answerSheet: window.answerSheet,
+      prefix: examPrefix,
+      questions,
+      time: {
+        is,
+        from,
+        to,
+        on,
+      },
+      marks: {
+        secured: 18.25,
+        correct: 22,
+        incorrect: 3,
+        skipped: 0,
+      },
+    };
+    const found = pastExams.filter((exam) => exam.id !== examId);
+    found.push(pastExam);
+    dispatcher(setPastExams(found));
+  };
+
   const handleConfirmSubmit = () => {
     navigate("answer-sheet/" + examId);
     window.onbeforeunload = () => {};
     console.log(window.answerSheet);
+    dispatcher(setAnswerSheet(window.answerSheet));
     setAreYouSure(false);
     dispatcher(disableContent(false));
-    setShowExamPage(false);
+    dispatcher(setShowExamPage(false));
     setIsExamSubmitting(true);
     setTimeout(() => {
       setIsExamSubmitting(false);
+      addToPastExam(true); // add to past exam - completed
     }, 3000);
   };
 
   const resetToHomePage = () => {
     dispatcher(disableContent(false));
+    dispatcher(setShowExamPage(true));
+    dispatcher(setAnswerSheet([]));
     dispatcher(setContentIndex(0));
     window.answerSheet = null;
     window.onbeforeunload = () => {};
     navigate("/dashboard");
     dispatcher(clearNewExamInputs());
+    addToPastExam(false); // add to past exam - incompleted
+  };
+
+  const backToHome = () => {
+    dispatcher(disableContent(false));
+    dispatcher(setShowExamPage(true));
+    dispatcher(setAnswerSheet([]));
+    window.answerSheet = null;
+    window.onbeforeunload = () => {};
+    navigate("/dashboard");
+    dispatcher(clearNewExamInputs());
+    if (showOnlyResult) {
+      dispatcher(setContentIndex(1));
+    } else {
+      dispatcher(setContentIndex(0));
+    }
   };
 
   // effects
   useEffect(() => {
-    if (contentIndex === 50) {
+    if (contentIndex === 50 && !onlyResult) {
       dispatcher(disableContent(true));
     }
-  }, [contentIndex, dispatcher]);
+  }, [contentIndex, onlyResult, dispatcher]);
 
   useEffect(() => {
     window.onbeforeunload = () => "Would you like to proceed?";
@@ -295,14 +369,12 @@ export default function ExamPage() {
             {!isGeneratingQuestion && (
               <>
                 <ExamHeaderHolder>
-                  <h3>Quick exam - 15</h3>
+                  <h3>
+                    {examPrefix} - {count}
+                  </h3>
                   <MetaHolder>
-                    <TimeMetaHolder>
-                      Start: {formatLocalTime(now.toLocaleTimeString())}
-                    </TimeMetaHolder>
-                    <TimeMetaHolder>
-                      End: {formatLocalTime(afterExam.toLocaleTimeString())}
-                    </TimeMetaHolder>
+                    <TimeMetaHolder>Start: {from}</TimeMetaHolder>
+                    <TimeMetaHolder>End: {to}</TimeMetaHolder>
                   </MetaHolder>
                   <ExamInfoHolder>
                     <ExamInfo>
@@ -311,13 +383,7 @@ export default function ExamPage() {
                     </ExamInfo>
                     <ExamInfo>
                       <Clock style={{ marginRight: "8px" }} size={20} />
-                      <p>
-                        {examTime === 60
-                          ? "1 hr"
-                          : examTime > 60
-                          ? "1+ hr"
-                          : examTime + " min"}
-                      </p>
+                      <p>{is}</p>
                     </ExamInfo>
                     <ExamInfo>
                       <Target style={{ marginRight: "8px" }} size={20} />
@@ -378,6 +444,7 @@ export default function ExamPage() {
             )}
           </>
         ) : (
+          /* Answer Page */
           <>
             {isExamSubmitting && (
               <LoadingHolder>Submitting the exam...</LoadingHolder>
@@ -385,11 +452,16 @@ export default function ExamPage() {
             {!isExamSubmitting && (
               <>
                 <ExamHeaderHolder>
-                  <h3>Quick exam - 15</h3>
+                  <h3>{name ? name : examPrefix + " - " + count}</h3>
                   <Info success>
-                    <InfoText>Answers submitted successfully.</InfoText>
+                    <InfoText>
+                      {showOnlyResult ? "" : "Answers submitted successfully."}
+                    </InfoText>
                   </Info>
-                  <ObtainedText>Obtained Marks: 3 / 6</ObtainedText>
+                  <ObtainedText>
+                    Obtained Marks: {marks ? marks.secured : "-"} /{" "}
+                    {answerSheet.length}
+                  </ObtainedText>
                   <ExamInfoHolder>
                     <ExamInfo>
                       <Check
@@ -397,21 +469,25 @@ export default function ExamPage() {
                         style={{ marginRight: "8px" }}
                         size={20}
                       />
-                      <p style={{ color: "#26D95F" }}>{questions.length}</p>
+                      <p style={{ color: "#26D95F" }}>
+                        {marks ? marks.correct : "-"}
+                      </p>
                     </ExamInfo>
                     <ExamInfo>
                       <X color="red" style={{ marginRight: "8px" }} size={20} />
-                      <p style={{ color: "red" }}>10</p>
+                      <p style={{ color: "red" }}>
+                        {marks ? marks.incorrect : "-"}
+                      </p>
                     </ExamInfo>
                     <ExamInfo>
                       <Slash style={{ marginRight: "8px" }} size={16} />
-                      <p>{questions.length}</p>
+                      <p>{marks ? marks.skipped : "-"}</p>
                     </ExamInfo>
                   </ExamInfoHolder>
                 </ExamHeaderHolder>
                 <Flex>
-                  <h3>Answersheet ({questions.length})</h3>
-                  <Flex showCursor={true} onClick={resetToHomePage}>
+                  <h3>Answersheet ({answerSheet.length})</h3>
+                  <Flex showCursor={true} onClick={backToHome}>
                     <ArrowLeft
                       color="grey"
                       style={{ marginRight: "5px" }}
@@ -421,8 +497,8 @@ export default function ExamPage() {
                   </Flex>
                 </Flex>
                 <QuestionsHolder>
-                  {window.answerSheet &&
-                    window.answerSheet.map((question, i) => (
+                  {answerSheet &&
+                    answerSheet.map((question, i) => (
                       <QuestionWrapper key={i}>
                         <CountAndCorrect>
                           <QuestionCountHolder>

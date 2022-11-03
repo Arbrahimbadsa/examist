@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
 const examSlice = createSlice({
   name: "exam",
   initialState: {
@@ -7,9 +6,15 @@ const examSlice = createSlice({
     totalQuestions: "",
     examTime: "",
     isNegAllowed: false,
+    showExamPage: true,
+    onlyResult: false,
+    isCompleted: false,
     subjects: [],
     chapters: [],
     questions: [],
+    answerSheet: [],
+    marks: null,
+    name: "",
   },
   reducers: {
     setQuestions: (state, action) => {
@@ -34,6 +39,24 @@ const examSlice = createSlice({
     setIsNegAllowed: (state, action) => {
       state.isNegAllowed = action.payload;
     },
+    setShowExamPage: (state, action) => {
+      state.showExamPage = action.payload;
+    },
+    setOnlyResult: (state, action) => {
+      state.onlyResult = action.payload;
+    },
+    setIsCompleted: (state, action) => {
+      state.isCompleted = action.payload;
+    },
+    setAnswerSheet: (state, action) => {
+      state.answerSheet = action.payload;
+    },
+    setMarks: (state, action) => {
+      state.marks = action.payload;
+    },
+    setName: (state, action) => {
+      state.name = action.payload;
+    },
     clearNewExamInputs: (state) => {
       state.examId = "";
       state.totalQuestions = "";
@@ -41,6 +64,12 @@ const examSlice = createSlice({
       state.subjects = [];
       state.chapters = [];
       state.questions = [];
+      state.answerSheet = [];
+      state.onlyResult = false;
+      state.showExamPage = true;
+      state.isCompleted = false;
+      state.marks = null;
+      state.name = "";
     },
     setSelectedIndex: (state, action) => {
       const question = action.payload.question;
@@ -64,5 +93,11 @@ export const {
   setIsNegAllowed,
   clearNewExamInputs,
   setExamId,
+  setShowExamPage,
+  setOnlyResult,
+  setAnswerSheet,
+  setMarks,
+  setName,
+  setIsCompleted,
 } = examSlice.actions;
 export default examSlice.reducer;

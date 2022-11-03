@@ -79,15 +79,15 @@ export const genQuestion = (count) => {
     const num1 = Math.floor(Math.random() * 10);
     const num2 = Math.floor(Math.random() * 10);
     const options = [
-      Math.floor(Math.random() * 100),
-      Math.floor(Math.random() * 100),
-      num1 + num2,
-      Math.floor(Math.random() * 100),
+      "*$" + Math.floor(Math.random() * 100) + "*$",
+      "*$" + Math.floor(Math.random() * 100) + "*$",
+      `$*${num1 + num2}*$`,
+      "*$" + Math.floor(Math.random() * 100) + "*$",
     ];
     const question = new QuestionModel(
       i + 1,
       `some-id-${i}`,
-      `What is the value of ${num1} + ${num2} ?`,
+      `What is the value of $*${num1} + ${num2}*$ ?`,
       options,
       3
     );

@@ -1,15 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { pastExams } from "../../utils/pastExams";
 const pastExamSlice = createSlice({
   name: "pastExams",
   initialState: {
-    value: pastExams.exams,
+    value: [],
   },
   reducers: {
     setPastExams: (state, action) => {
-      state.value.pastExams = [...state.value.pastExams, action.payload];
+      state.value = action.payload;
+    },
+    removePastExam: (state, action) => {
+      const newPastExams = state.value;
+      newPastExams.forEach((exam, i) => {
+        if (exam.id === action.payload) newPastExams.splice(i, 1);
+      });
+      state.value = newPastExams;
     },
   },
 });
-export const { setPastExams } = pastExamSlice.actions;
+export const { setPastExams, removePastExam } = pastExamSlice.actions;
 export default pastExamSlice.reducer;
