@@ -14,6 +14,9 @@ import { updateUser } from "../redux/reducers/userSlice";
 import { updateTheme } from "../redux/reducers/themeSlice";
 import Logo from "./Logo";
 import { object, string } from "yup";
+import userImage from "../assets/user-11.jpg";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
 
 const Container = styled.div`
   display: flex;
@@ -81,8 +84,8 @@ const Error = styled.div`
 `;
 
 const loginSchema = object({
-  password: string().min(6, "Incorrect credentials."),
-  rollOrNumber: string().min(6, "Incorrect credentials."),
+  password: string().min(6, "Incorrect credentials!"),
+  rollOrNumber: string().min(6, "Incorrect credentials!"),
 });
 
 export default function LoginPage() {
@@ -91,7 +94,7 @@ export default function LoginPage() {
   const theme = useTheme();
   const auth = useAuth();
   const dispatcher = useDispatch();
-  const [rollOrNumber, setRollOrNumber] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -112,23 +115,33 @@ export default function LoginPage() {
   // handlers
   const handleSubmit = (e) => {
     // prevent default
-    // demo login
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      const test = { rollOrNumber, password };
-      loginSchema
-        .validate(test)
-        .then((tested) => {
-          const user = { auth: true, name: "Arb Rahim Badsa" };
-          dispatcher(setUser(user));
-          setIsSubmitting(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setIsSubmitting(false);
+    const test = { username, password };
+    loginSchema
+      .validate(test)
+      .then(async () => {
+        const { data } = await axios.post(`${HOST}/api/user/login`, {
+          username,
+          password,
         });
-    }, 3000);
+        const user = {
+          auth: true,
+          name: data.name,
+          id: data.id,
+          username: data.username,
+          role: data.role,
+          image: userImage,
+          token: data.token,
+        };
+        dispatcher(setUser(user));
+        setIsSubmitting(false);
+      })
+      .catch((err) => {
+        const msg = err.response?.data.error || err.message;
+        setError(msg);
+        setIsSubmitting(false);
+      });
   };
   return (
     !auth && (
@@ -144,12 +157,12 @@ export default function LoginPage() {
               </GreyText>
               {error && <Error>{error}</Error>}
               <Input
-                label="Roll or Phone"
-                placeholder="Enter your roll"
+                label="Username"
+                placeholder="Enter your username"
                 id="roll"
-                type="number"
-                value={rollOrNumber}
-                onChange={(e) => setRollOrNumber(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
               <Input

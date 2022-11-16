@@ -12,6 +12,9 @@ import { setUser } from "../redux/reducers/userSlice";
 import { useEffect } from "react";
 import Logo from "./Logo";
 import { string, object } from "yup";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
+import userImage from "../assets/user-11.jpg";
 
 const Container = styled.div`
   display: flex;
@@ -79,7 +82,7 @@ const Error = styled.div`
 
 const registrationSchema = object({
   name: string().min(3, "Name shoulbe at least 3 digits."),
-  phone: string().length(11, "Phone number must be 11 digits."),
+  phone: string(),
   password: string().min(6, "Passwrod should be at least 6 digits."),
 });
 
@@ -89,7 +92,7 @@ export default function RegistrationPage() {
   const navigate = useNavigate();
   const dispatcher = useDispatch();
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -109,11 +112,23 @@ export default function RegistrationPage() {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
-      const test = { name, phone, password };
+      const test = { name, username, password };
       registrationSchema
         .validate(test)
-        .then((tested) => {
-          const user = { auth: true, name: "Arb Rahim Badsa" };
+        .then(async () => {
+          const { data } = await axios.post(`${HOST}/api/user/register`, {
+            name,
+            username,
+            password,
+          });
+          const user = {
+            auth: true,
+            name: data.name,
+            id: data.id,
+            username: data.username,
+            role: data.role,
+            image: userImage,
+          };
           dispatcher(setUser(user));
           setIsSubmitting(false);
         })
@@ -146,12 +161,12 @@ export default function RegistrationPage() {
                 required
               />
               <Input
-                label="Phone"
-                placeholder="+88"
+                label="Username"
+                placeholder="Enter your username"
                 id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
               <Input

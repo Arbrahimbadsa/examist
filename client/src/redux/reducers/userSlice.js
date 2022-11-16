@@ -3,8 +3,11 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     value: {
-      name: "Arb",
-      auth: true,
+      name: "",
+      username: "",
+      id: "",
+      image: "",
+      auth: false,
     },
   },
   reducers: {

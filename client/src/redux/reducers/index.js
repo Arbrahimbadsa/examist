@@ -9,6 +9,10 @@ import positionSlice from "./positionSlice";
 import loadingSlice from "./loadingSlice";
 import pastExamSlice from "./pastExamSlice";
 import examCountSlice from "./examCountSlice";
+import socketSlice from "./socketSlice";
+import toastSlice from "./toastSlice";
+import liveChallengeSlice from "./liveChallengeSlice";
+import notificationSlice from "./notificationSlice";
 const rootReducer = {
   user: userSlice,
   theme: themeSlice,
@@ -21,5 +25,9 @@ const rootReducer = {
   loading: loadingSlice,
   pastExams: pastExamSlice,
   examCount: examCountSlice,
+  socket: socketSlice,
+  toast: toastSlice,
+  liveChallenge: liveChallengeSlice,
+  notification: notificationSlice,
 };
 export default rootReducer;

@@ -1,7 +1,10 @@
 import { Home } from "react-feather";
 import styled from "styled-components";
+import useUser from "../hooks/useUser";
 import { CardHeader, Card, CardContent } from "./Card";
+import Challenge from "./Challenge";
 import DashboardAnalytics from "./DashboardAnalytics";
+
 import QuickPractice from "./QuickPractice";
 const MainContent = styled.div`
   width: 100%;
@@ -25,19 +28,18 @@ const PageIconHolder = styled.div`
 `;
 
 export default function DashboardMainContent() {
+  const user = useUser();
   return (
     <>
       <PageTitle>
         <PageIconHolder>
           <Home size={15} />
         </PageIconHolder>
-        <h3>Dashboard</h3>
+        <h3>Hello, {user.name}!</h3>
       </PageTitle>
       <MainContent>
         <QuickPractice />
-        <Card centered={true}>
-          <CardHeader title="Challenges" />
-        </Card>
+        <Challenge />
         <Card centered={true}>
           <CardHeader title="Analytics" />
           <CardContent>

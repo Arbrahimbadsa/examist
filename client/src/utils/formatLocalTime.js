@@ -1,6 +1,5 @@
 export default function formatLocalTime(timeString) {
   // "12:56:54 PM"
-  //alert(timeString);
   const arr = timeString.split(" ");
   const timeArr = arr[0].split(":");
   timeArr.pop();

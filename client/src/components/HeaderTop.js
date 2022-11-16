@@ -14,7 +14,6 @@ import {
   Settings as SettingsIcon,
   Bookmark,
   LogOut,
-  Bell,
 } from "react-feather";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +27,9 @@ import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
 import NewExamDialog from "./NewExamDialog";
 import { useNavigate } from "react-router-dom";
+import useUser from "../hooks/useUser";
+import Notification from "./Notification";
+
 const HeaderTopHolder = styled.div`
   background: #fff;
   display: flex;
@@ -154,17 +156,6 @@ const Flex = styled.div`
   display: flex;
   align-items: center;
 `;
-const RedDot = styled.div`
-  height: 12px;
-  width: 12px;
-  background: red;
-  position: absolute;
-  right: 5px;
-  top: 1.5px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  display: ${(props) => (props.show ? "block" : "none")};
-`;
 
 const Category = ({ label, icon, active, onClick }) => {
   return (
@@ -187,21 +178,14 @@ const Switcher = () => {
   );
 };
 
-const Notification = ({ isNew }) => {
-  return (
-    <IconButton style={{ position: "relative" }}>
-      <Bell color="black" size={20} />
-      <RedDot show={isNew} />
-    </IconButton>
-  );
-};
-
 export default function HeaderTop() {
   const dispatcher = useDispatch();
   const isExamStarted = useSelector((state) => state.isExamStarted.value);
   const isGeneratingQuestion = useSelector(
     (state) => state.loading.isGeneratingQuestion
   );
+  const socket = useSelector((state) => state.socket.value);
+  const user = useUser();
   const [categories] = useState([
     {
       label: "New",
@@ -291,7 +275,7 @@ export default function HeaderTop() {
             ))}
         </HeaderTopLeft>
         <HeaderTopRight>
-          <Notification isNew={true} />
+          <Notification isNew={false} />
           <IconButton onClick={handleNewExam} margin="0">
             <Plus color="black" size={20} />
           </IconButton>
@@ -302,7 +286,7 @@ export default function HeaderTop() {
           >
             <Avatar alt="user" src={userImage} />
             <MetaHolder>
-              <UserName>Arb Rahim Badsa</UserName>
+              <UserName>{user.name}</UserName>
               <RankText>
                 <GreyText>Rank: 320</GreyText>
               </RankText>
@@ -339,6 +323,7 @@ export default function HeaderTop() {
               onItemClick={() => {
                 setUserMenu(false);
                 dispatcher(logout());
+                socket && socket.disconnect();
               }}
             >
               <Flex>

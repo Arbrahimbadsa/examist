@@ -25,11 +25,12 @@ const SidebarHolder = styled.div`
   flex-direction: column;
   font-family: "Poppins", sans-serif;
   position: relative;
+  z-index: 9999999;
   @media only screen and (max-width: 600px) {
     transition: 0.2s;
     position: absolute;
     transform: translate(-220px, 0);
-    z-index: 99999999 !important;
+    z-index: 9999999999999999999 !important;
   }
 `;
 const SidebarHider = styled.div`

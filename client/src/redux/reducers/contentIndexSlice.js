@@ -6,7 +6,7 @@ const contentIndexSlice = createSlice({
   },
   reducers: {
     setContentIndex: (state, action) => {
-      const notToSave = [50];
+      const notToSave = [50, 3];
       if (notToSave.indexOf(action.payload) < 0) {
         localStorage.setItem("contentIndex", action.payload);
       }

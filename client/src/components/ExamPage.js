@@ -206,14 +206,14 @@ export default function ExamPage() {
   const navigate = useNavigate();
 
   // states (redux)
-  const examTime = useSelector((state) => state.exam.examTime);
-  const questions = useSelector((state) => state.exam.questions);
-  const examId = useSelector((state) => state.exam.examId);
-  const totalQuestions = useSelector((state) => state.exam.totalQuestions);
-  const isNegAllowed = useSelector((state) => state.exam.isNegAllowed);
-  const subjects = useSelector((state) => state.exam.subjects);
-  const examPrefix = useSelector((state) => state.examCount.prefix);
-  const quickExamCount = useSelector((state) => state.examCount.quickExamCount);
+  const examTime = useSelector((state) => state.exam.examTime); // current exam time
+  const questions = useSelector((state) => state.exam.questions); // current exam questions (for exam)
+  const examId = useSelector((state) => state.exam.examId); // current exam id
+  const totalQuestions = useSelector((state) => state.exam.totalQuestions); // current exam total question number
+  const isNegAllowed = useSelector((state) => state.exam.isNegAllowed); // current exam whether neg allowed
+  const subjects = useSelector((state) => state.exam.subjects); // current exam subjects
+  const examPrefix = useSelector((state) => state.examCount.prefix); // current exam prefix
+  const quickExamCount = useSelector((state) => state.examCount.quickExamCount); // current exam prefix count
   const customExamCount = useSelector(
     (state) => state.examCount.customExamCount
   );
@@ -258,11 +258,12 @@ export default function ExamPage() {
   };
 
   const is =
-    examTime === 60 ? "1 hr" : examTime > 60 ? "1+ hr" : examTime + " min";
-  const from = formatLocalTime(now.toLocaleTimeString());
-  const to = formatLocalTime(afterExam.toLocaleTimeString());
-  const on = getDate();
+    examTime === 60 ? "1 hr" : examTime > 60 ? "1+ hr" : examTime + " min"; // current exam time
+  const from = formatLocalTime(now.toLocaleTimeString()); // exam started from
+  const to = formatLocalTime(afterExam.toLocaleTimeString()); // exam will end at
+  const on = getDate(); // today (date)
 
+  // add to past exam
   const addToPastExam = (completed) => {
     const pastExam = {
       id: examId,
@@ -281,7 +282,7 @@ export default function ExamPage() {
         on,
       },
       marks: {
-        secured: 18.25,
+        secured: Math.floor(Math.random() * questions.length),
         correct: 22,
         incorrect: 3,
         skipped: 0,
@@ -292,6 +293,7 @@ export default function ExamPage() {
     dispatcher(setPastExams(found));
   };
 
+  // confirm exam submit
   const handleConfirmSubmit = () => {
     navigate("answer-sheet/" + examId);
     window.onbeforeunload = () => {};
@@ -348,6 +350,7 @@ export default function ExamPage() {
   return (
     <>
       <ExamPageContainer ref={container}>
+        {/************** Are you sure dialog ***********/}
         <Dialog
           show={areYouSure}
           title="Are you sure you want to submit?"
@@ -361,6 +364,8 @@ export default function ExamPage() {
             </DialogSubmitButton>
           </DialogBody>
         </Dialog>
+
+        {/************** Exam Page ***********/}
         {showExamPage ? (
           <>
             {isGeneratingQuestion && (
@@ -368,6 +373,7 @@ export default function ExamPage() {
             )}
             {!isGeneratingQuestion && (
               <>
+                {/************** Exam Header ***********/}
                 <ExamHeaderHolder>
                   <h3>
                     {examPrefix} - {count}
@@ -391,6 +397,9 @@ export default function ExamPage() {
                     </ExamInfo>
                   </ExamInfoHolder>
                 </ExamHeaderHolder>
+
+                {/************** Timer and Exit Button ***********/}
+
                 <TimerAndExitHolder>
                   <Timer
                     expiryTimestamp={time}
@@ -398,6 +407,9 @@ export default function ExamPage() {
                   />
                   <ExitButton onClick={resetToHomePage}>Exit</ExitButton>
                 </TimerAndExitHolder>
+
+                {/************** Questions Holder ***********/}
+
                 <QuestionsHolder>
                   {questions &&
                     questions.map((question, i) => (
@@ -434,6 +446,8 @@ export default function ExamPage() {
                         </Question>
                       </QuestionWrapper>
                     ))}
+                  {/************** Submit Button ***********/}
+
                   <SubmitButtonHolder>
                     <SubmitButton onClick={handleExamSubmit}>
                       Submit
@@ -485,6 +499,9 @@ export default function ExamPage() {
                     </ExamInfo>
                   </ExamInfoHolder>
                 </ExamHeaderHolder>
+
+                {/************** Answer Sheet Title ***********/}
+
                 <Flex>
                   <h3>Answersheet ({answerSheet.length})</h3>
                   <Flex showCursor={true} onClick={backToHome}>

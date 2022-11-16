@@ -66,11 +66,11 @@ export function DialogHeader({ children }) {
 export function DialogBody({ children, ...rest }) {
   return <DialogBodyContainer {...rest}>{children}</DialogBodyContainer>;
 }
-export function Dialog({ children, show, title, onClose, small }) {
+export function Dialog({ children, show, title, onClose, small, ...rest }) {
   return (
     <>
       {show && <Backdrop onClick={onClose} />}
-      <DialogBoxContainer show={show} small={small}>
+      <DialogBoxContainer show={show} small={small} {...rest}>
         <DialogHeader>
           <div>{title}</div>
           <div style={{ cursor: "pointer" }} onClick={onClose}>
