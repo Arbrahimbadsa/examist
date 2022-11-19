@@ -3,6 +3,13 @@ const authRouter = express.Router();
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { User } from "../models/user.js";
+import { verify } from "../middleware/checkLogin.js";
+
+authRouter.get("/verify", verify, async (req, res) => {
+  res.status(200).json({
+    message: "Enter",
+  });
+});
 
 authRouter.post("/login", async (req, res) => {
   try {

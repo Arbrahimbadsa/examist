@@ -35,7 +35,7 @@ export default function DashboardMainContent() {
         <PageIconHolder>
           <Home size={15} />
         </PageIconHolder>
-        <h3>Hello, {user.name}!</h3>
+        <h3>Hello, {user?.name}!</h3>
       </PageTitle>
       <MainContent>
         <QuickPractice />

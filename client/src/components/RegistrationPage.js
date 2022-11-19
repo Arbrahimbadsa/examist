@@ -111,32 +111,30 @@ export default function RegistrationPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      const test = { name, username, password };
-      registrationSchema
-        .validate(test)
-        .then(async () => {
-          const { data } = await axios.post(`${HOST}/api/user/register`, {
-            name,
-            username,
-            password,
-          });
-          const user = {
-            auth: true,
-            name: data.name,
-            id: data.id,
-            username: data.username,
-            role: data.role,
-            image: userImage,
-          };
-          dispatcher(setUser(user));
-          setIsSubmitting(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setIsSubmitting(false);
+    const test = { name, username, password };
+    registrationSchema
+      .validate(test)
+      .then(async () => {
+        const { data } = await axios.post(`${HOST}/api/user/register`, {
+          name,
+          username,
+          password,
         });
-    }, 3000);
+        const user = {
+          auth: true,
+          name: data.name,
+          id: data.id,
+          username: data.username,
+          role: data.role,
+          image: userImage,
+        };
+        dispatcher(setUser(user));
+        setIsSubmitting(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setIsSubmitting(false);
+      });
   };
   return (
     !auth && (

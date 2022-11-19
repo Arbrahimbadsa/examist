@@ -76,20 +76,26 @@ export const set_two = [
 export const genQuestion = (count) => {
   const set_threee = [];
   for (let i = 0; i < count; i++) {
-    const num1 = Math.floor(Math.random() * 10);
-    const num2 = Math.floor(Math.random() * 10);
-    const options = [
-      "*$" + Math.floor(Math.random() * 100) + "*$",
-      "*$" + Math.floor(Math.random() * 100) + "*$",
-      `$*${num1 + num2}*$`,
-      "*$" + Math.floor(Math.random() * 100) + "*$",
-    ];
+    const num1 = Math.floor(Math.random() * 100);
+    const num2 = Math.floor(Math.random() * 100);
+    const ops = [];
+    const random = Math.floor(Math.random() * 4);
+    for (let j = 0; j < 4; j++) {
+      const o = `$*${Math.floor(Math.random() * 100)}*$`;
+      const r = `$*${num1 + num2}*$`;
+      if (j === random) {
+        ops[j] = r;
+      } else {
+        ops[j] = o;
+      }
+    }
+    console.log(ops);
     const question = new QuestionModel(
       i + 1,
       `some-id-${i}`,
       `What is the value of $*${num1} + ${num2}*$ ?`,
-      options,
-      3
+      ops,
+      random + 1
     );
     set_threee.push(question);
   }

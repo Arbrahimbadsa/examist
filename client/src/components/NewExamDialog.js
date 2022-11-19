@@ -28,6 +28,10 @@ import {
   setQuickExamCount,
 } from "../redux/reducers/examCountSlice";
 import { setCustomExamCount } from "../redux/reducers/examCountSlice";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
+import useUser from "../hooks/useUser";
+import QuestionModel from "../utils/classes/QuestionModel";
 
 const InputHolder = styled.div`
   display: flex;
@@ -49,6 +53,7 @@ const Flex = styled.div`
 export default function NewExamDialog({ show, onClose, setNewExam }) {
   const dispatcher = useDispatch();
   const navigate = useNavigate();
+  const user = useUser();
 
   // inputs
   // const examId = useSelector((state) => state.exam.examId);
@@ -99,15 +104,40 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     dispatcher(setIsGeneratingQuestion(false)); // hide loader
     clearInputs(); // clear all inputs after the exam is created
   };
-  const handleStartExam = (e) => {
+  const handleStartExam = async (e) => {
     e.preventDefault();
     dispatcher(setContentIndex(50)); // go to exam page
     setNewExam(false); // hide the new exam dialog
     dispatcher(disableContent(true)); // disable sidebar and header when a new exam's started
     dispatcher(setIsGeneratingQuestion(true)); // show the generating exam loader
 
-    // fetch the question
-    const s = genQuestion(+totalQuestions); // generate "totalQuestions" number of questions
+    // fetch the questions from server
+
+    const s = [];
+    const url = `${HOST}/api/question/get-filtered-questions`;
+    const { data } = await axios.post(
+      url,
+      { subject: "math1", chapter: "chap1", count: 3 },
+      {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      }
+    );
+    data &&
+      data.forEach((examData, i) => {
+        const q = new QuestionModel(
+          examData._id,
+          i + 1,
+          examData.label,
+          examData.options,
+          null
+        );
+        s.push(q);
+      });
+
+    // dummy questions
+    //const s = genQuestion(+totalQuestions); // generate "totalQuestions" number of questions
 
     // set the exam inputs
     const examId = uuidv4();

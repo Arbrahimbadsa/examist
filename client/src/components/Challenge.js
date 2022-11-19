@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useUser from "../hooks/useUser";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { setPlayer1, setPlayer2 } from "../redux/reducers/liveChallengeSlice";
+import GreyText from "./GreyText";
 
 const Flex = styled.div`
   display: flex;
@@ -134,7 +135,7 @@ export default function Challenge() {
           {onlineUsers &&
             onlineUsers.map((user, i) => (
               <div key={i}>
-                {user.username !== currentUser.username && (
+                {user?.username !== currentUser?.username && (
                   <User
                     key={user.id}
                     onClick={() => {
@@ -166,6 +167,7 @@ export default function Challenge() {
             </Flex>
           }
         />
+        <GreyText>No recent challenges.</GreyText>
       </Card>
     </>
   );

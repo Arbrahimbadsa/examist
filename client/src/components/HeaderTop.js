@@ -286,7 +286,7 @@ export default function HeaderTop() {
           >
             <Avatar alt="user" src={userImage} />
             <MetaHolder>
-              <UserName>{user.name}</UserName>
+              <UserName>{user?.name}</UserName>
               <RankText>
                 <GreyText>Rank: 320</GreyText>
               </RankText>
@@ -301,12 +301,14 @@ export default function HeaderTop() {
             show={userMenu}
             onClose={() => setUserMenu(false)}
           >
-            <MenuItem>
-              <Flex>
-                <Plus style={{ marginRight: "5px" }} size={15} />
-                Add Questions
-              </Flex>
-            </MenuItem>
+            {user?.role === "admin" && (
+              <MenuItem>
+                <Flex>
+                  <Plus style={{ marginRight: "5px" }} size={15} />
+                  Add Questions
+                </Flex>
+              </MenuItem>
+            )}
             <MenuItem>
               <Flex>
                 <Bookmark style={{ marginRight: "5px" }} size={15} />

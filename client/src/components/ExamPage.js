@@ -16,6 +16,7 @@ import RenderLatex from "./RenderLatex";
 import {
   clearNewExamInputs,
   setAnswerSheet,
+  setMarks,
   setSelectedIndex,
   setShowExamPage,
 } from "../redux/reducers/examSlice";
@@ -36,6 +37,8 @@ import { useNavigate } from "react-router-dom";
 import GreyText from "./GreyText";
 import { setPastExams } from "../redux/reducers/pastExamSlice";
 import { getDate } from "../utils/getDate";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
 
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
@@ -264,7 +267,7 @@ export default function ExamPage() {
   const on = getDate(); // today (date)
 
   // add to past exam
-  const addToPastExam = (completed) => {
+  const addToPastExam = (completed, marks) => {
     const pastExam = {
       id: examId,
       name: `${examPrefix} - ${count}`,
@@ -281,12 +284,7 @@ export default function ExamPage() {
         to,
         on,
       },
-      marks: {
-        secured: Math.floor(Math.random() * questions.length),
-        correct: 22,
-        incorrect: 3,
-        skipped: 0,
-      },
+      marks,
     };
     const found = pastExams.filter((exam) => exam.id !== examId);
     found.push(pastExam);
@@ -294,18 +292,40 @@ export default function ExamPage() {
   };
 
   // confirm exam submit
-  const handleConfirmSubmit = () => {
-    navigate("answer-sheet/" + examId);
+  const handleConfirmSubmit = async () => {
+    //navigate("answer-sheet/" + examId);
     window.onbeforeunload = () => {};
+
+    // map the ids to get the answers
+    const questionData = questions.map((q) => {
+      return { id: q.id, selectedIndex: q.selectedIndex };
+    });
+    const ids = questions.map((q) => q.id);
+    // fetch the answers
+    const { data } = await axios.post(`${HOST}/api/question/test-answers`, {
+      questionData,
+      allId: ids,
+    });
+    // set the correct answers
+    window.answerSheet.forEach((q, i) => {
+      if (q.id === data.answers[i]._id) {
+        q.correctAnswer = data.answers[i].correctAnswer;
+      }
+    });
+    console.log(data);
+    // test the answer sheet
     console.log(window.answerSheet);
+    // set the answers sheet
     dispatcher(setAnswerSheet(window.answerSheet));
+    // set the marks
+    dispatcher(setMarks(data.marks));
     setAreYouSure(false);
     dispatcher(disableContent(false));
     dispatcher(setShowExamPage(false));
     setIsExamSubmitting(true);
     setTimeout(() => {
       setIsExamSubmitting(false);
-      addToPastExam(true); // add to past exam - completed
+      addToPastExam(true, data.marks); // add to past exam - completed
     }, 3000);
   };
 
@@ -318,7 +338,7 @@ export default function ExamPage() {
     window.onbeforeunload = () => {};
     navigate("/dashboard");
     dispatcher(clearNewExamInputs());
-    addToPastExam(false); // add to past exam - incompleted
+    addToPastExam(false, {}); // add to past exam - incompleted
   };
 
   const backToHome = () => {
