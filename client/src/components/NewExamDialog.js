@@ -4,7 +4,7 @@ import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
 import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
 import { Dialog, DialogBody } from "./Dialog";
-import { genQuestion, set_two } from "../utils/questions";
+import { set_two } from "../utils/questions";
 import {
   setChapters,
   setExamId,
@@ -30,8 +30,8 @@ import {
 import { setCustomExamCount } from "../redux/reducers/examCountSlice";
 import axios from "axios";
 import { HOST } from "../utils/hostname";
-import useUser from "../hooks/useUser";
 import QuestionModel from "../utils/classes/QuestionModel";
+import useHeader from "../hooks/useHeader";
 
 const InputHolder = styled.div`
   display: flex;
@@ -53,7 +53,7 @@ const Flex = styled.div`
 export default function NewExamDialog({ show, onClose, setNewExam }) {
   const dispatcher = useDispatch();
   const navigate = useNavigate();
-  const user = useUser();
+  const { headers } = useHeader();
 
   // inputs
   // const examId = useSelector((state) => state.exam.examId);
@@ -117,11 +117,9 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     const url = `${HOST}/api/question/get-filtered-questions`;
     const { data } = await axios.post(
       url,
-      { subject: "math1", chapter: "chap1", count: 3 },
+      { subject: "math1", chapter: "chap1", count: +totalQuestions },
       {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
+        headers,
       }
     );
     data &&

@@ -3,11 +3,13 @@ const dashboardQuestionSlice = createSlice({
   name: "dashboardQuestion",
   initialState: {
     value: {
-      label: "Here is your question?",
+      label: "Loading...",
       options: [],
-      correctIndex: 0,
+      correctIndex: null,
       selectedIndex: null,
       touched: false,
+      subject: null,
+      chapter: null,
     },
   },
   reducers: {

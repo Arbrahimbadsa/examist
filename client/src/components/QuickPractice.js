@@ -1,4 +1,4 @@
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import useDashboardQuestion from "../hooks/useDashboardQuestion";
 import {
@@ -14,44 +14,64 @@ import {
 } from "./Question";
 import IconButton from "./IconButton";
 import { RefreshCcw } from "react-feather";
-import { getRandomQuestion } from "../helpers/getDashboardQuestion";
 import RenderLatex from "./RenderLatex";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
 
 export default function QuickPractice() {
   const dispatcher = useDispatch();
-  const { label, options, selectedIndex, correctIndex, touched } =
-    useDashboardQuestion();
-  // effects
-  useLayoutEffect(() => {
-    const question = {
-      label: String.raw`Calculate the value of -  $**\int ^{\infty }_{0}\dfrac{xdx}{1+x^{4}}**$ and this would render and if $*x = 5*$ then find the value of this. $**(x+y) / 3 = 5**$`,
-      options: [
-        String.raw`$**\int ^{\infty }_{0}\dfrac{xdx}{1+x^{4}}**$`,
-        "For",
-        "Nothing",
-        "Lmao",
-      ],
-      correctIndex: 0,
+  const {
+    label,
+    options,
+    selectedIndex,
+    correctIndex,
+    touched,
+    subject,
+    chapter,
+  } = useDashboardQuestion();
+
+  useEffect(() => {
+    const getData = async () => {
+      const { data } = await axios.get(`${HOST}/api/question/random`);
+      dispatcher(
+        setDashboardQuestion({
+          ...data,
+          correctIndex: data.correctAnswer,
+          selectedIndex: null,
+          touched: false,
+        })
+      );
     };
-    dispatcher(setDashboardQuestion(question));
+    getData();
   }, [dispatcher]);
 
   const handleOptionClick = (index) => {
     if (!touched) dispatcher(setDashboardQuestionOption(index));
   };
   const abcd = ["A", "B", "C", "D"];
+
+  const handleRefresh = () => {
+    const getData = async () => {
+      const { data } = await axios.get(`${HOST}/api/question/random`);
+      dispatcher(
+        setDashboardQuestion({
+          ...data,
+          correctIndex: data.correctAnswer,
+          selectedIndex: null,
+          touched: false,
+        })
+      );
+    };
+    getData();
+  };
+
   return (
     <Card>
       <CardHeader
         title="Quick Practice"
         actions={
           <>
-            <IconButton
-              margin="0"
-              onClick={() =>
-                dispatcher(setDashboardQuestion(getRandomQuestion()))
-              }
-            >
+            <IconButton margin="0" onClick={handleRefresh}>
               <RefreshCcw size={15} />
             </IconButton>
             {/* 
@@ -62,7 +82,7 @@ export default function QuickPractice() {
           </>
         }
       />
-      <CardDotLine beforeDot="Chemistry" afterDot="Chapter One" />
+      <CardDotLine beforeDot={subject} afterDot={chapter} />
       <Question>
         <QuestionLabel>
           <RenderLatex latex={label} />
@@ -72,19 +92,19 @@ export default function QuickPractice() {
             options.map((option, i) => (
               <QuestionOption
                 optionCount={abcd[i]}
-                onOptionClick={() => handleOptionClick(i)}
+                onOptionClick={() => handleOptionClick(i + 1)}
                 key={i}
                 label={option}
                 selectedCorrect={
-                  i === selectedIndex && selectedIndex === correctIndex
+                  i + 1 === selectedIndex && selectedIndex === correctIndex
                 }
                 selectedInCorrect={
-                  i === selectedIndex && selectedIndex !== correctIndex
+                  i + 1 === selectedIndex && selectedIndex !== correctIndex
                 }
                 touched={touched}
                 changeCorrectBg={
                   touched &&
-                  i === correctIndex &&
+                  i + 1 === correctIndex &&
                   selectedIndex !== correctIndex
                 }
                 onlyOne={true}

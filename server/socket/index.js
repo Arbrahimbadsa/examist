@@ -26,7 +26,6 @@ export const onConnection = (socket, io) => {
   });
 
   socket.on("confirm-challenge", (data) => {
-    console.log(data.to.username);
     socket.broadcast.to(data.to.username).emit("challenge-confirmed", data);
   });
 

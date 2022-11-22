@@ -9,6 +9,7 @@ import authRouter from "./api/auth.js";
 import questionRouter from "./api/question.js";
 import "colors";
 import { connectMongoDB } from "./config/db.js";
+import pastExamRouter from "./api/pastExam.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ connectMongoDB();
 // register routers
 app.use("/api/user", authRouter);
 app.use("/api/question", questionRouter);
+app.use("/api/past-exam", pastExamRouter);
 
 // register middlewear and setup
 io.use(applySocketMiddlewear);

@@ -11,7 +11,7 @@ const pastExamSlice = createSlice({
     removePastExam: (state, action) => {
       const newPastExams = state.value;
       newPastExams.forEach((exam, i) => {
-        if (exam.id === action.payload) newPastExams.splice(i, 1);
+        if (exam._id === action.payload) newPastExams.splice(i, 1);
       });
       state.value = newPastExams;
     },

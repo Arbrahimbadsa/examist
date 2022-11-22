@@ -1,10 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import deleteCookie from "../../utils/deleteCookie";
+import getCookie from "../../utils/getCookie";
+import setCookie from "../../utils/setCookie";
 const userSlice = createSlice({
   name: "user",
   initialState: {
     value: {
       name: "Test name",
-      username: "test-username",
+      username: null,
       id: "test-id",
       image: "....",
       auth: true,
@@ -12,30 +15,20 @@ const userSlice = createSlice({
   },
   reducers: {
     updateUser: (state) => {
-      if (localStorage) {
-        const userData = localStorage.getItem("user");
-        state.value = JSON.parse(userData);
-      } else {
-        state.value = {
-          ...state.value,
-        };
-      }
+      const userData = getCookie("user");
+      state.value = userData;
     },
     setUser: (state, action) => {
-      if (localStorage) {
-        const userData = localStorage.getItem("user");
-        if (userData) {
-          state.value = JSON.parse(userData);
-        } else {
-          localStorage.setItem("user", JSON.stringify(action.payload));
-          state.value = action.payload;
-        }
+      const userData = getCookie("user");
+      if (userData) {
+        state.value = userData;
       } else {
+        setCookie("user", action.payload);
         state.value = action.payload;
       }
     },
     logout: (state) => {
-      localStorage.removeItem("user");
+      deleteCookie("user");
       localStorage.removeItem("contentIndex");
       state.value = null;
     },

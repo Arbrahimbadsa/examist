@@ -39,6 +39,8 @@ import { setPastExams } from "../redux/reducers/pastExamSlice";
 import { getDate } from "../utils/getDate";
 import axios from "axios";
 import { HOST } from "../utils/hostname";
+import useHeader from "../hooks/useHeader";
+import useUser from "../hooks/useUser";
 
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
@@ -208,6 +210,10 @@ const Flex = styled.div`
 export default function ExamPage() {
   const navigate = useNavigate();
 
+  // hooks
+  const { headers } = useHeader();
+  const user = useUser();
+
   // states (redux)
   const examTime = useSelector((state) => state.exam.examTime); // current exam time
   const questions = useSelector((state) => state.exam.questions); // current exam questions (for exam)
@@ -231,6 +237,7 @@ export default function ExamPage() {
   const marks = useSelector((state) => state.exam.marks);
   const name = useSelector((state) => state.exam.name);
   const pastExams = useSelector((state) => state.pastExams.value);
+  const retake = useSelector((state) => state.exam.retake);
 
   // timer
   const time = new Date();
@@ -267,11 +274,11 @@ export default function ExamPage() {
   const on = getDate(); // today (date)
 
   // add to past exam
-  const addToPastExam = (completed, marks) => {
+  const addToPastExam = async (completed, marks) => {
     const pastExam = {
       id: examId,
       name: `${examPrefix} - ${count}`,
-      questionsCount: totalQuestions,
+      questionsCount: +totalQuestions,
       isNegAllowed: isNegAllowed,
       isCompleted: completed,
       subjects: subjects,
@@ -285,9 +292,28 @@ export default function ExamPage() {
         on,
       },
       marks,
+      user: user?.id,
     };
-    const found = pastExams.filter((exam) => exam.id !== examId);
-    found.push(pastExam);
+    if (retake === "retake") {
+      // delete the entry first if only it's a retake
+      // we are sure that examId is now exam._id
+      await axios.post(
+        `${HOST}/api/past-exam/delete`,
+        {
+          id: examId,
+          user: user?.id,
+        },
+        { headers }
+      );
+    }
+    // add past exam to db (could be a retake or new)
+    const { data } = await axios.post(
+      `${HOST}/api/past-exam/add`,
+      { pastExam },
+      { headers }
+    );
+    const found = pastExams.filter((exam) => exam._id !== examId);
+    found.push(data);
     dispatcher(setPastExams(found));
   };
 
@@ -296,21 +322,28 @@ export default function ExamPage() {
     //navigate("answer-sheet/" + examId);
     window.onbeforeunload = () => {};
 
+    setIsExamSubmitting(true);
+
     // map the ids to get the answers
     const questionData = questions.map((q) => {
       return { id: q.id, selectedIndex: q.selectedIndex };
     });
     const ids = questions.map((q) => q.id);
     // fetch the answers
-    const { data } = await axios.post(`${HOST}/api/question/test-answers`, {
-      questionData,
-      allId: ids,
-    });
+    const { data } = await axios.post(
+      `${HOST}/api/question/test-answers`,
+      {
+        questionData,
+        allId: ids,
+      },
+      {
+        headers,
+      }
+    );
     // set the correct answers
     window.answerSheet.forEach((q, i) => {
-      if (q.id === data.answers[i]._id) {
-        q.correctAnswer = data.answers[i].correctAnswer;
-      }
+      const entry = data?.answers.find((e) => e._id === q.id);
+      q.correctAnswer = entry.correctAnswer;
     });
     console.log(data);
     // test the answer sheet
@@ -322,11 +355,8 @@ export default function ExamPage() {
     setAreYouSure(false);
     dispatcher(disableContent(false));
     dispatcher(setShowExamPage(false));
-    setIsExamSubmitting(true);
-    setTimeout(() => {
-      setIsExamSubmitting(false);
-      addToPastExam(true, data.marks); // add to past exam - completed
-    }, 3000);
+    setIsExamSubmitting(false);
+    addToPastExam(true, data.marks); // add to past exam - completed
   };
 
   const resetToHomePage = () => {

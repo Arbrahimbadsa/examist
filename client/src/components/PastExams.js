@@ -12,7 +12,7 @@ import {
 import { Card, CardContent, CardHeader } from "./Card";
 import IconButton from "./IconButton";
 import { Menu, MenuItem } from "./Menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import {
@@ -24,14 +24,23 @@ import {
   setName,
   setOnlyResult,
   setQuestions,
+  setRetake,
   setShowExamPage,
+  setTotalQuestions,
 } from "../redux/reducers/examSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
-import { removePastExam } from "../redux/reducers/pastExamSlice";
+import { removePastExam, setPastExams } from "../redux/reducers/pastExamSlice";
 import {
   setCustomExamCountD,
+  setExamPrefix,
   setQuickExamCountD,
 } from "../redux/reducers/examCountSlice";
+import axios from "axios";
+import { HOST } from "../utils/hostname";
+import useHeader from "../hooks/useHeader";
+import useUser from "../hooks/useUser";
+import convertToQM from "../utils/convertToQM";
+
 const PastExamsHolder = styled.div`
   font-family: "Poppins", sans-serif;
   overflow-y: scroll;
@@ -156,7 +165,11 @@ const Info = styled.p`
 `;
 const PastExamCard = ({ exam }) => {
   const [actionsMenu, setActionsMenu] = useState(false);
+
   const dispatcher = useDispatch();
+  const { headers } = useHeader();
+  const user = useUser();
+
   const handleViewResult = () => {
     dispatcher(setContentIndex(50));
     dispatcher(setShowExamPage(false));
@@ -167,28 +180,40 @@ const PastExamCard = ({ exam }) => {
     dispatcher(setName(exam.name));
     dispatcher(setQuestions(exam.questions));
   };
+
+  // retake past exam
   const handleRetake = () => {
     dispatcher(setContentIndex(50));
-    dispatcher(setExamId(exam.id));
+    dispatcher(setExamId(exam._id));
     dispatcher(setExamTime(parseInt(exam.time.is)));
     dispatcher(setQuestions(exam.questions));
     dispatcher(setIsCompleted(exam.isCompleted));
+    const prefix = exam.prefix.replace("-", "");
+    dispatcher(setExamPrefix(prefix));
+    dispatcher(setName(exam.name));
+    dispatcher(setTotalQuestions(exam.questionsCount));
+    dispatcher(setRetake("retake"));
     // if any of the questions are touched, simply make them touchable again.
-    exam &&
-      exam.questions.forEach((e) => {
-        e.touched = false;
-        e.selectedIndex = [];
-        e.doubleAnswered = false;
-      });
   };
-  const handleDelete = () => {
-    dispatcher(removePastExam(exam.id));
+
+  // delete past exam
+  const handleDelete = async () => {
+    await axios.post(
+      `${HOST}/api/past-exam/delete`,
+      {
+        id: exam._id,
+        user: user?.id,
+      },
+      { headers }
+    );
+    dispatcher(removePastExam(exam._id));
     if (exam.prefix === "Quick Exam") {
       dispatcher(setQuickExamCountD());
     } else {
       dispatcher(setCustomExamCountD());
     }
   };
+
   return (
     <Card
       style={{
@@ -316,6 +341,37 @@ const PastExamCard = ({ exam }) => {
 export default function PastExams() {
   const pastExams = useSelector((state) => state.pastExams.value);
   const totalPastExams = pastExams.length;
+  const user = useUser();
+
+  const dispatcher = useDispatch();
+
+  // hooks
+  const { headers } = useHeader();
+
+  // fetch past exams
+  useEffect(() => {
+    const getData = async () => {
+      const { data } = await axios.post(
+        `${HOST}/api/past-exam/all`,
+        { id: user?.id },
+        {
+          headers,
+        }
+      );
+      const newDataArr = [];
+      data?.forEach((_data) => {
+        const sheet = convertToQM(_data?.answerSheet, "full");
+        const qs = convertToQM(_data?.questions, "half");
+        _data.answerSheet = sheet;
+        _data.questions = qs;
+        newDataArr.push(_data);
+      });
+      dispatcher(setPastExams(data));
+    };
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <PastExamsHolder>
       <PageTitle>

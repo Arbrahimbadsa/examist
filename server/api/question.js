@@ -3,7 +3,18 @@ const questionRouter = express.Router();
 import { verify } from "../middleware/checkLogin.js";
 import { Question } from "../models/question.js";
 
-questionRouter.post("/test-answers", async (req, res) => {
+questionRouter.get("/random", async (req, res) => {
+  const randomQuestion = await Question.aggregate([{ $sample: { size: 1 } }]);
+  if (randomQuestion) {
+    return res.status(201).json(randomQuestion[0]);
+  } else {
+    return res.status(500).json({
+      error: "Something went wrong.",
+    });
+  }
+});
+
+questionRouter.post("/test-answers", verify, async (req, res) => {
   const { questionData, allId } = req.body;
   let correct = 0;
   let skipped = 0;
@@ -62,7 +73,7 @@ questionRouter.post("/add", verify, (req, res) => {
   }
 });
 
-questionRouter.post("/get-filtered-questions", async (req, res) => {
+questionRouter.post("/get-filtered-questions", verify, async (req, res) => {
   const { subjects, chapters, count } = req.body;
   if (count) {
     if (subjects && chapters) {
@@ -75,11 +86,16 @@ questionRouter.post("/get-filtered-questions", async (req, res) => {
       ).limit(count);
       return res.status(201).json(data);
     } else {
-      const data = await Question.find(
-        {},
-        { _id: 1, label: 1, options: 1 }
-      ).limit(count);
-      return res.status(201).json(data);
+      // const data = await Question.find(
+      //   {},
+      //   { _id: 1, label: 1, options: 1 }
+      // ).limit(count);
+      const randomQuestions = await Question.aggregate([
+        {
+          $sample: { size: count },
+        },
+      ]);
+      return res.status(201).json(randomQuestions);
     }
   } else {
     return res.status(400).json({

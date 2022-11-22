@@ -14,7 +14,6 @@ import { updateUser } from "../redux/reducers/userSlice";
 import { updateTheme } from "../redux/reducers/themeSlice";
 import Logo from "./Logo";
 import { object, string } from "yup";
-import userImage from "../assets/user-11.jpg";
 import axios from "axios";
 import { HOST } from "../utils/hostname";
 
@@ -131,14 +130,17 @@ export default function LoginPage() {
           id: data.id,
           username: data.username,
           role: data.role,
-          image: userImage,
           token: data.token,
         };
         dispatcher(setUser(user));
         setIsSubmitting(false);
       })
       .catch((err) => {
-        const msg = err.response?.data.error || err.message;
+        const error =
+          typeof err.response?.data.error === "object"
+            ? err?.message
+            : err.response?.data.error;
+        const msg = error;
         setError(msg);
         setIsSubmitting(false);
       });

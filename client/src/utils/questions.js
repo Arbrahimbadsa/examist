@@ -12,14 +12,14 @@ export const questions = [
   {
     label: "What is 5 + 5?",
     options: [100, 200, 500, 10],
-    correctIndex: 3,
+    correctIndex: 4,
     selectedIndex: null,
     touched: false,
   },
   {
     label: "Which one is a colour?",
     options: ["Arb", "Ador", "Tushar", "Blue"],
-    correctIndex: 3,
+    correctIndex: 4,
     selectedIndex: null,
     touched: false,
   },
@@ -89,7 +89,6 @@ export const genQuestion = (count) => {
         ops[j] = o;
       }
     }
-    console.log(ops);
     const question = new QuestionModel(
       i + 1,
       `some-id-${i}`,
