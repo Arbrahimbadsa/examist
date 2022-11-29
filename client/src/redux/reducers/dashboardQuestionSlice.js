@@ -16,6 +16,11 @@ const dashboardQuestionSlice = createSlice({
     setDashboardQuestion: (state, action) => {
       state.value = action.payload;
     },
+    setDashboardQuestionLabel: (state, action) => {
+      state.value = {
+        label: action.payload,
+      };
+    },
     setDashboardQuestionOption: (state, action) => {
       state.value = {
         ...state.value,
@@ -25,6 +30,9 @@ const dashboardQuestionSlice = createSlice({
     },
   },
 });
-export const { setDashboardQuestion, setDashboardQuestionOption } =
-  dashboardQuestionSlice.actions;
+export const {
+  setDashboardQuestion,
+  setDashboardQuestionOption,
+  setDashboardQuestionLabel,
+} = dashboardQuestionSlice.actions;
 export default dashboardQuestionSlice.reducer;

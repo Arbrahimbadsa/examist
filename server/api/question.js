@@ -33,16 +33,27 @@ questionRouter.post("/test-answers", verify, async (req, res) => {
         secured -= 0.25;
       } else {
         const index = q.selectedIndex[0];
-        if (
-          q.id === answerData[i].id &&
-          index === answerData[i].correctAnswer
-        ) {
+        // find the question you are looking for...
+        const touchedQuestionFromServer = answerData?.find(
+          (e) => e?.id === q?.id
+        );
+        if (touchedQuestionFromServer.correctAnswer === index) {
           correct++;
           secured += 1;
         } else {
           incorrect++;
           secured -= 0.25;
         }
+        // if (
+        //   q.id === answerData[i].id &&
+        //   index === answerData[i].correctAnswer
+        // ) {
+        //   correct++;
+        //   secured += 1;
+        // } else {
+        //   incorrect++;
+        //   secured -= 0.25;
+        // }
       }
     }
   });

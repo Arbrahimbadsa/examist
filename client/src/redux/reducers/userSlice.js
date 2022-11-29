@@ -6,10 +6,6 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     value: {
-      name: "Test name",
-      username: null,
-      id: "test-id",
-      image: "....",
       auth: true,
     },
   },
@@ -31,6 +27,7 @@ const userSlice = createSlice({
       deleteCookie("user");
       localStorage.removeItem("contentIndex");
       state.value = null;
+      state.value.auth = false;
     },
   },
 });

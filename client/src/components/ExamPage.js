@@ -37,10 +37,12 @@ import { useNavigate } from "react-router-dom";
 import GreyText from "./GreyText";
 import { setPastExams } from "../redux/reducers/pastExamSlice";
 import { getDate } from "../utils/getDate";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 import useHeader from "../hooks/useHeader";
 import useUser from "../hooks/useUser";
+import userImage from "../assets/user-11.jpg";
+import userImage1 from "../assets/user-6.jpg";
+import { resetLiveChallenge } from "../redux/reducers/liveChallengeSlice";
 
 const ExamPageContainer = styled.div`
   padding: 26px 20% 10px 20%;
@@ -78,6 +80,7 @@ const ExamHeaderHolder = styled.div`
   border-radius: 5px;
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
     0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+  background: ${(props) => (props.secured < 0 ? "white" : "white")};
 `;
 const TimerAndExitHolder = styled.div`
   display: flex;
@@ -206,6 +209,25 @@ const Flex = styled.div`
     cursor: default;
   }
 `;
+const UserInfoHolder = styled.div`
+  flex-grow: 1;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+const Avatar = styled.img`
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  display: block;
+`;
+const UserName = styled.div`
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+`;
 
 export default function ExamPage() {
   const navigate = useNavigate();
@@ -238,6 +260,10 @@ export default function ExamPage() {
   const name = useSelector((state) => state.exam.name);
   const pastExams = useSelector((state) => state.pastExams.value);
   const retake = useSelector((state) => state.exam.retake);
+  const isLiveChallenge = useSelector((state) => state.exam.isLiveChallenge);
+  const player1 = useSelector((state) => state.liveChallenge.player1);
+  const player2 = useSelector((state) => state.liveChallenge.player2);
+  const socket = useSelector((state) => state.socket.value);
 
   // timer
   const time = new Date();
@@ -298,7 +324,7 @@ export default function ExamPage() {
       // delete the entry first if only it's a retake
       // we are sure that examId is now exam._id
       await axios.post(
-        `${HOST}/api/past-exam/delete`,
+        `/api/past-exam/delete`,
         {
           id: examId,
           user: user?.id,
@@ -308,13 +334,26 @@ export default function ExamPage() {
     }
     // add past exam to db (could be a retake or new)
     const { data } = await axios.post(
-      `${HOST}/api/past-exam/add`,
+      `/api/past-exam/add`,
       { pastExam },
       { headers }
     );
     const found = pastExams.filter((exam) => exam._id !== examId);
     found.push(data);
     dispatcher(setPastExams(found));
+  };
+
+  const handleLiveChallenge = (name) => {
+    if (isLiveChallenge) {
+      socket?.emit(name, {
+        to: player2,
+        from: {
+          name: player1?.name,
+          id: player1?.id,
+          username: player1?.username,
+        },
+      });
+    }
   };
 
   // confirm exam submit
@@ -331,7 +370,7 @@ export default function ExamPage() {
     const ids = questions.map((q) => q.id);
     // fetch the answers
     const { data } = await axios.post(
-      `${HOST}/api/question/test-answers`,
+      `/api/question/test-answers`,
       {
         questionData,
         allId: ids,
@@ -355,8 +394,13 @@ export default function ExamPage() {
     setAreYouSure(false);
     dispatcher(disableContent(false));
     dispatcher(setShowExamPage(false));
-    setIsExamSubmitting(false);
-    addToPastExam(true, data.marks); // add to past exam - completed
+    setTimeout(() => {
+      setIsExamSubmitting(false);
+      addToPastExam(true, data.marks); // add to past exam - completed
+    }, 1000);
+
+    // live challenge submitted by one user
+    handleLiveChallenge("submit-challenge");
   };
 
   const resetToHomePage = () => {
@@ -368,6 +412,7 @@ export default function ExamPage() {
     window.onbeforeunload = () => {};
     navigate("/dashboard");
     dispatcher(clearNewExamInputs());
+    handleLiveChallenge("left-challenge");
     addToPastExam(false, {}); // add to past exam - incompleted
   };
 
@@ -396,6 +441,12 @@ export default function ExamPage() {
   useEffect(() => {
     window.onbeforeunload = () => "Would you like to proceed?";
   }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatcher(resetLiveChallenge());
+    };
+  }, [dispatcher]);
 
   return (
     <>
@@ -447,6 +498,53 @@ export default function ExamPage() {
                     </ExamInfo>
                   </ExamInfoHolder>
                 </ExamHeaderHolder>
+
+                {/* This section is only for live challenging */}
+                {isLiveChallenge && (
+                  <ExamHeaderHolder
+                    style={{ textAlign: "left", display: "flex", gap: "10px" }}
+                  >
+                    <UserInfoHolder>
+                      <Avatar src={userImage} alt="" />
+                      <UserName>{player1?.name}</UserName>
+                      <GreyText>busy with exam</GreyText>
+                    </UserInfoHolder>
+                    <UserInfoHolder>
+                      <b>VS</b>
+                    </UserInfoHolder>
+                    <UserInfoHolder>
+                      <Avatar src={userImage1} alt="" />
+                      <UserName
+                        style={{
+                          color:
+                            player2?.status === "left"
+                              ? "red"
+                              : player2?.status === "submitted"
+                              ? "#26d95f"
+                              : "black",
+                        }}
+                      >
+                        {player2?.name}
+                      </UserName>
+                      <GreyText
+                        style={{
+                          color:
+                            player2?.status === "left"
+                              ? "red"
+                              : player2?.status === "submitted"
+                              ? "#26d95f"
+                              : "grey",
+                        }}
+                      >
+                        {player2?.status === "left"
+                          ? "left"
+                          : player2?.status === "submitted"
+                          ? "submitted the exam"
+                          : "busy with exam"}
+                      </GreyText>
+                    </UserInfoHolder>
+                  </ExamHeaderHolder>
+                )}
 
                 {/************** Timer and Exit Button ***********/}
 
@@ -515,7 +613,7 @@ export default function ExamPage() {
             )}
             {!isExamSubmitting && (
               <>
-                <ExamHeaderHolder>
+                <ExamHeaderHolder secured={marks?.secured}>
                   <h3>{name ? name : examPrefix + " - " + count}</h3>
                   <Info success>
                     <InfoText>
@@ -523,8 +621,10 @@ export default function ExamPage() {
                     </InfoText>
                   </Info>
                   <ObtainedText>
-                    Obtained Marks: {marks ? marks.secured : "-"} /{" "}
-                    {answerSheet.length}
+                    Obtained Marks:{" "}
+                    <b>
+                      {marks ? marks.secured : "-"} / {answerSheet.length}
+                    </b>
                   </ObtainedText>
                   <ExamInfoHolder>
                     <ExamInfo>

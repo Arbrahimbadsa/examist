@@ -16,6 +16,7 @@ const examSlice = createSlice({
     marks: null,
     name: "",
     retake: null,
+    isLiveChallenge: false,
   },
   reducers: {
     setQuestions: (state, action) => {
@@ -61,6 +62,9 @@ const examSlice = createSlice({
     setRetake: (state, action) => {
       state.retake = action.payload;
     },
+    setIsLiveChallenge: (state, action) => {
+      state.isLiveChallenge = action.payload;
+    },
     clearNewExamInputs: (state) => {
       state.examId = "";
       state.totalQuestions = "";
@@ -75,6 +79,7 @@ const examSlice = createSlice({
       state.marks = null;
       state.name = "";
       state.retake = null;
+      state.isLiveChallenge = false;
     },
     setSelectedIndex: (state, action) => {
       const question = action.payload.question;
@@ -105,5 +110,6 @@ export const {
   setName,
   setIsCompleted,
   setRetake,
+  setIsLiveChallenge,
 } = examSlice.actions;
 export default examSlice.reducer;

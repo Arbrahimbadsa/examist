@@ -6,6 +6,7 @@ import { setExamPrefix } from "../redux/reducers/examCountSlice";
 import {
   setExamId,
   setExamTime,
+  setIsLiveChallenge,
   setIsNegAllowed,
   setQuestions,
   setTotalQuestions,
@@ -13,6 +14,7 @@ import {
 import {
   setIsAccepted,
   setIsStarted,
+  setPlayer2,
 } from "../redux/reducers/liveChallengeSlice";
 import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
 import {
@@ -48,20 +50,45 @@ export default function useEvents() {
         dispatcher(showToast("Your challenge has been accepted."));
       });
 
+      socket.on("left-challenge", (data) => {
+        const player2 = data?.from;
+        dispatcher(showToast(`${player2?.name} left the challenge.`));
+        dispatcher(
+          setPlayer2({
+            ...player2,
+            status: "left",
+          })
+        );
+      });
+
+      socket.on("submit-challenge", (data) => {
+        const player2 = data?.from;
+        dispatcher(showToast(`${player2?.name} submitted the challenge.`));
+        dispatcher(
+          setPlayer2({
+            ...player2,
+            status: "submitted",
+          })
+        );
+      });
+
       // this will fire after the countdown ends
       socket.on("start-exam", (data) => {
+        // live challenge starts from here.
         const exam = data;
         const questions = [];
         exam.questions.forEach((e) => {
           const ex = new QuestionModel(
-            e.id,
+            e._id,
             e.count,
             e.label,
             e.options,
-            e.correctAnswer
+            null
           );
           questions.push(ex);
         });
+
+        // dispatch all the exam info
         dispatcher(setContentIndex(50));
         dispatcher(disableContent(true));
         disableContent(setIsGeneratingQuestion(true));
@@ -72,6 +99,7 @@ export default function useEvents() {
         dispatcher(setQuestions(questions));
         dispatcher(setExamPrefix(exam.name));
         dispatcher(setIsGeneratingQuestion(false));
+        dispatcher(setIsLiveChallenge(true));
       });
     }
     return () => {

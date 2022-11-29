@@ -15,7 +15,11 @@ const pastExamSlice = createSlice({
       });
       state.value = newPastExams;
     },
+    clearPastExams: (state) => {
+      state.value = [];
+    },
   },
 });
-export const { setPastExams, removePastExam } = pastExamSlice.actions;
+export const { setPastExams, removePastExam, clearPastExams } =
+  pastExamSlice.actions;
 export default pastExamSlice.reducer;

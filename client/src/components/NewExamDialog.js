@@ -11,6 +11,7 @@ import {
   setExamTime,
   setIsNegAllowed,
   setQuestions,
+  setShowExamPage,
   setSubjects,
   setTotalQuestions,
 } from "../redux/reducers/examSlice";
@@ -28,8 +29,7 @@ import {
   setQuickExamCount,
 } from "../redux/reducers/examCountSlice";
 import { setCustomExamCount } from "../redux/reducers/examCountSlice";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 import QuestionModel from "../utils/classes/QuestionModel";
 import useHeader from "../hooks/useHeader";
 
@@ -77,6 +77,7 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
   };
 
   const handleStartQuickExam = async () => {
+    dispatcher(setShowExamPage(true));
     dispatcher(setContentIndex(50));
     setNewExam(false);
     dispatcher(disableContent(true));
@@ -106,6 +107,7 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
   };
   const handleStartExam = async (e) => {
     e.preventDefault();
+    dispatcher(setShowExamPage(true));
     dispatcher(setContentIndex(50)); // go to exam page
     setNewExam(false); // hide the new exam dialog
     dispatcher(disableContent(true)); // disable sidebar and header when a new exam's started
@@ -114,7 +116,7 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     // fetch the questions from server
 
     const s = [];
-    const url = `${HOST}/api/question/get-filtered-questions`;
+    const url = `/api/question/get-filtered-questions`;
     const { data } = await axios.post(
       url,
       { subject: "math1", chapter: "chap1", count: +totalQuestions },

@@ -12,15 +12,14 @@ import { setUser } from "../redux/reducers/userSlice";
 import { useEffect } from "react";
 import Logo from "./Logo";
 import { string, object } from "yup";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 import userImage from "../assets/user-11.jpg";
+import { updateUser } from "../redux/reducers/userSlice";
 
 const Container = styled.div`
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding: 1rem;
   background: #ebeef6;
   overflow-y: scroll;
   font-family: "Poppins", sans-serif;
@@ -34,7 +33,6 @@ const LeftSide = styled.div`
   height: 100%;
   width: 100%;
   background: #fff;
-  border-radius: 20px 0 0 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,7 +52,6 @@ const RightSide = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  border-radius: 0 20px 20px 0;
   @media only screen and (max-width: 600px) {
     display: none;
   }
@@ -104,7 +101,7 @@ export default function RegistrationPage() {
   }, [auth, navigate]);
 
   useEffect(() => {
-    //dispatcher(updateUser());
+    dispatcher(updateUser());
   }, [dispatcher]);
 
   // handlers
@@ -115,7 +112,7 @@ export default function RegistrationPage() {
     registrationSchema
       .validate(test)
       .then(async () => {
-        const { data } = await axios.post(`${HOST}/api/user/register`, {
+        const { data } = await axios.post(`/api/user/register`, {
           name,
           username,
           password,

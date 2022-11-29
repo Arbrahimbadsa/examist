@@ -58,4 +58,25 @@ pastExamRouter.post("/delete", verify, async (req, res) => {
   }
 });
 
+pastExamRouter.post("/deleteAll", verify, async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (id) {
+      await PastExam.deleteMany({ user: id });
+      res.status(200).json({
+        message: "Deleted.",
+      });
+    } else {
+      res.status(501).json({
+        error: "No id provided.",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: "Something went wrong.",
+      details: error,
+    });
+  }
+});
+
 export default pastExamRouter;

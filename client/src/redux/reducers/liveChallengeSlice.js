@@ -20,9 +20,18 @@ const liveChallengeSlice = createSlice({
     setIsStarted: (state, action) => {
       state.isStarted = action.payload;
     },
+    resetLiveChallenge: (state) => {
+      state.isAccepted = false;
+      state.isStarted = false;
+    },
   },
 });
 
-export const { setPlayer1, setPlayer2, setIsAccepted, setIsStarted } =
-  liveChallengeSlice.actions;
+export const {
+  setPlayer1,
+  setPlayer2,
+  setIsAccepted,
+  setIsStarted,
+  resetLiveChallenge,
+} = liveChallengeSlice.actions;
 export default liveChallengeSlice.reducer;

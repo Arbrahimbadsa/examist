@@ -2,6 +2,9 @@ const theme = {
   light: {
     optionColor: "#fff",
     mainBg: "#f5f5f5",
+    cardBg: "white",
+    textColor: "black",
+    cardHeaderColor: "black",
     loginPage: {
       bg: "#101727",
       text: "#101727",
@@ -13,7 +16,10 @@ const theme = {
   },
   dark: {
     optionColor: "#13b2ec",
-    mainBg: "#ebeef6",
+    mainBg: "#23272f",
+    cardBg: "#343a46",
+    textColor: "white",
+    cardHeaderColor: "#13b2ec",
     loginPage: {
       bg: "#101727",
       text: "#101727",

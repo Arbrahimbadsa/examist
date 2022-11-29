@@ -14,14 +14,13 @@ import { updateUser } from "../redux/reducers/userSlice";
 import { updateTheme } from "../redux/reducers/themeSlice";
 import Logo from "./Logo";
 import { object, string } from "yup";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 
 const Container = styled.div`
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding: 1rem;
+  overflow-y: scroll;
   font-family: "Poppins", sans-serif;
   background: ${(props) => props.theme.mainBg};
   @media only screen and (max-width: 600px) {
@@ -34,7 +33,6 @@ const LeftSide = styled.div`
   height: 100%;
   width: 100%;
   background: #fff;
-  border-radius: 20px 0 0 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -56,7 +54,6 @@ const RightSide = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  border-radius: 0 20px 20px 0;
   @media only screen and (max-width: 600px) {
     display: none;
   }
@@ -83,8 +80,8 @@ const Error = styled.div`
 `;
 
 const loginSchema = object({
-  password: string().min(6, "Incorrect credentials!"),
-  rollOrNumber: string().min(6, "Incorrect credentials!"),
+  password: string().min(0, "Incorrect credentials!"),
+  rollOrNumber: string().min(0, "Incorrect credentials!"),
 });
 
 export default function LoginPage() {
@@ -105,6 +102,10 @@ export default function LoginPage() {
   }, [auth, navigate]);
 
   useEffect(() => {
+    console.log(auth);
+  }, [auth]);
+
+  useEffect(() => {
     // enable local host user update
     dispatcher(updateUser());
     // enable theme mode saving
@@ -116,11 +117,12 @@ export default function LoginPage() {
     // prevent default
     e.preventDefault();
     setIsSubmitting(true);
+    console.log("cool");
     const test = { username, password };
     loginSchema
       .validate(test)
       .then(async () => {
-        const { data } = await axios.post(`${HOST}/api/user/login`, {
+        const { data } = await axios.post(`/api/user/login`, {
           username,
           password,
         });
@@ -144,6 +146,18 @@ export default function LoginPage() {
         setError(msg);
         setIsSubmitting(false);
       });
+  };
+  const handleTest = () => {
+    dispatcher(
+      setUser({
+        auth: true,
+        name: "Arb",
+        id: "some-id",
+        username: "arb",
+        role: "admin",
+        token: "test",
+      })
+    );
   };
   return (
     !auth && (
@@ -179,6 +193,7 @@ export default function LoginPage() {
               <Button type="submit">
                 {isSubmitting ? "Logging..." : "Login"}
               </Button>
+              <Button onClick={handleTest}>Test</Button>
               <Link to="/register">
                 <GreyText>Click here to register.</GreyText>
               </Link>

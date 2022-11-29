@@ -93,11 +93,16 @@ export default function Challenge() {
   const dispatcher = useDispatch();
 
   useEffect(() => {
-    socket &&
-      socket.on("users", (users) => {
-        setOnlineUsers(users);
-      });
-    return () => {};
+    socket?.emit("get-users");
+  }, [socket]);
+
+  useEffect(() => {
+    socket?.on("users", (users) => {
+      setOnlineUsers(Object.values(users));
+    });
+    return () => {
+      socket?.off("users");
+    };
   }, [socket]);
 
   const handleUserClick = (user) => {
@@ -127,9 +132,9 @@ export default function Challenge() {
         title="Challenge a friend"
       >
         <Info>
-          {onlineUsers && onlineUsers.length === 1
+          {onlineUsers && onlineUsers.length - 1 === 0
             ? "Currently no users online."
-            : "Select an user to continue"}
+            : `Online users (${onlineUsers.length - 1})`}
         </Info>
         <UsersHolder>
           {onlineUsers &&

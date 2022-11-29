@@ -1,7 +1,8 @@
 import styled from "styled-components";
+import useTheme from "../hooks/useTheme";
 const CardHolder = styled.div`
   padding: 16px;
-  background: #fff;
+  background: ${(props) => props.theme.cardBg};
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
     0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
   border-radius: 5px;
@@ -14,6 +15,7 @@ const CardHeaderHolder = styled.div`
   display: flex;
   align-items: center;
   margin: ${(props) => props.margin};
+  color: ${(props) => props.color};
 `;
 const DotLineHolder = styled.div`
   display: flex;
@@ -57,13 +59,19 @@ export function CardDotLine({ beforeDot, afterDot }) {
   );
 }
 export function CardHeader({ title, actions, margin, ...rest }) {
+  const theme = useTheme();
   return (
-    <CardHeaderHolder margin={margin} {...rest}>
+    <CardHeaderHolder color={theme.cardHeaderColor} margin={margin} {...rest}>
       <CardTitleText>{title}</CardTitleText>
       <CardActions>{actions}</CardActions>
     </CardHeaderHolder>
   );
 }
 export function Card({ children, ...rest }) {
-  return <CardHolder {...rest}>{children}</CardHolder>;
+  const theme = useTheme();
+  return (
+    <CardHolder theme={theme} {...rest}>
+      {children}
+    </CardHolder>
+  );
 }

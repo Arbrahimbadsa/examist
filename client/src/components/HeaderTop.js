@@ -29,9 +29,11 @@ import NewExamDialog from "./NewExamDialog";
 import { useNavigate } from "react-router-dom";
 import useUser from "../hooks/useUser";
 import Notification from "./Notification";
+import { clearPastExams } from "../redux/reducers/pastExamSlice";
+import useTheme from "../hooks/useTheme";
 
 const HeaderTopHolder = styled.div`
-  background: #fff;
+  background: ${(props) => props.color};
   display: flex;
   user-select: none;
   min-height: 55px;
@@ -217,6 +219,7 @@ export default function HeaderTop() {
   const [userMenu, setUserMenu] = useState(false);
   const [newExam, setNewExam] = useState(false);
   const navigate = useNavigate();
+  const theme = useTheme();
   const handleNewExam = () =>
     !isExamStarted && setNewExam(!newExam) && !isGeneratingQuestion;
   const goHome = () => {
@@ -226,6 +229,16 @@ export default function HeaderTop() {
     window.onbeforeunload = () => {};
     navigate("/dashboard");
   };
+
+  // handle logout
+  const handleLogOut = () => {
+    navigate("/login");
+    setUserMenu(false);
+    dispatcher(logout());
+    dispatcher(clearPastExams());
+    socket && socket.disconnect();
+  };
+
   return (
     <>
       {/* Category dialogues */}
@@ -240,7 +253,7 @@ export default function HeaderTop() {
         />
       )}
       {/* ------------------- */}
-      <HeaderTopHolder>
+      <HeaderTopHolder color={theme.cardBg}>
         {isExamStarted && <HeaderHider />}
         <HeaderTopLeft>
           <HeaderOnPhoneHolder>
@@ -302,7 +315,12 @@ export default function HeaderTop() {
             onClose={() => setUserMenu(false)}
           >
             {user?.role === "admin" && (
-              <MenuItem>
+              <MenuItem
+                onItemClick={() => {
+                  dispatcher(setContentIndex(38)); // add question code - 38
+                  setUserMenu(false);
+                }}
+              >
                 <Flex>
                   <Plus style={{ marginRight: "5px" }} size={15} />
                   Add Questions
@@ -321,13 +339,7 @@ export default function HeaderTop() {
                 Settings
               </Flex>
             </MenuItem>
-            <MenuItem
-              onItemClick={() => {
-                setUserMenu(false);
-                dispatcher(logout());
-                socket && socket.disconnect();
-              }}
-            >
+            <MenuItem onItemClick={handleLogOut}>
               <Flex>
                 <LogOut style={{ marginRight: "5px" }} size={15} />
                 Logout

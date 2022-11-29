@@ -6,20 +6,21 @@ export const applySocketMiddlewear = (socket, next) => {
 };
 
 // connected users
-const users = [];
+const allUsers = {};
 
 export const onConnection = (socket, io) => {
+  // GET CURRENTLY CONNECTED USERS
+  // save the currently connected user
+  allUsers[socket.user.id] = socket.user;
+  // serve users on request
+  socket.on("get-users", () => {
+    io.sockets.emit("users", allUsers);
+  });
+
   //register the user
   socket.on("register-key", (user) => {
     socket.join(user.username);
   });
-
-  const found = users.findIndex((u) => u.username === socket.username);
-  if (found == -1) users.push(socket.user);
-
-  setInterval(() => {
-    io.sockets.emit("users", users);
-  }, 500);
 
   socket.on("send-challenge", (data) => {
     socket.broadcast.to(data.to.username).emit("send-challenge", data);
@@ -29,14 +30,25 @@ export const onConnection = (socket, io) => {
     socket.broadcast.to(data.to.username).emit("challenge-confirmed", data);
   });
 
+  socket.on("left-challenge", (data) => {
+    socket.broadcast.to(data.to.username).emit("left-challenge", data);
+    console.log("============ left =====");
+    console.log(data);
+  });
+
+  socket.on("submit-challenge", (data) => {
+    socket.broadcast.to(data.to.username).emit("submit-challenge", data);
+    console.log("============ submit =====");
+    console.log(data);
+  });
+
   // on starting exam
   socket.on("start-exam", (data) => {
     io.sockets.emit("start-exam", data);
   });
 
   socket.on("disconnect", () => {
-    const index = users.findIndex((u) => u.username === socket.username);
-    users.splice(index, 1);
-    io.sockets.emit("users", users);
+    delete allUsers[socket.user.id];
+    io.sockets.emit("users", allUsers);
   });
 };

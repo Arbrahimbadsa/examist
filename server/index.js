@@ -2,7 +2,6 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import bodyParser from "body-parser";
 import { applySocketMiddlewear, onConnection } from "./socket/index.js";
 import dotenv from "dotenv";
 import authRouter from "./api/auth.js";
@@ -44,5 +43,5 @@ io.on("connection", (socket) => {
 // start server
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () =>
-  console.log(`Server started at port ${PORT}`.blue)
+  console.log(`\nServer started at port ${PORT}`.white.bgMagenta)
 );

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import userImage from "../assets/user-11.jpg";
-import { genQuestion } from "../utils/questions";
 import { v4 as uuidv4 } from "uuid";
+import axios from "../api/axios";
+import useHeader from "../hooks/useHeader";
 
 const LiveChallengeHolder = styled.div`
   font-family: "Poppins", sans-serif;
@@ -56,6 +57,9 @@ const CountDownHolder = styled.div`
   align-items: center;
   color: #fff;
   font-size: 30px;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
 `;
 export default function LiveChallenge() {
   const player1 = useSelector((state) => state.liveChallenge.player1);
@@ -64,9 +68,10 @@ export default function LiveChallenge() {
   const [countDown, setCountDown] = useState(5);
   const isStarted = useSelector((state) => state.liveChallenge.isStarted);
   const socket = useSelector((state) => state.socket.value);
+  const { headers } = useHeader();
 
   useEffect(() => {
-    const t = setInterval(() => {
+    const t = setInterval(async () => {
       if (countDown !== 0 && isAccepted) {
         setCountDown(countDown - 1);
       } else {
@@ -74,18 +79,28 @@ export default function LiveChallenge() {
         if (isAccepted && isStarted) {
           if (socket) {
             clearInterval(t);
-            const s = genQuestion(25);
+            const url = `/api/question/get-filtered-questions`;
+            const { data } = await axios.post(
+              url,
+              { count: 5 },
+              {
+                headers,
+              }
+            );
+            console.log(data);
+            const s = data;
             const exam = {
               name: "Live Challenge",
               player1,
               player2,
               questions: s,
               examId: uuidv4(),
-              totalQuestions: 25,
-              examTime: 25,
+              totalQuestions: s?.length,
+              examTime: 60,
               isNegAllowed: true,
             };
             socket.emit("start-exam", exam);
+            // go to useEvents.js for socket.on()
           }
         }
       }
@@ -93,6 +108,7 @@ export default function LiveChallenge() {
     return () => {
       clearInterval(t);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countDown, isAccepted, isStarted, socket, player1, player2]);
 
   return (
@@ -105,12 +121,12 @@ export default function LiveChallenge() {
       <UsersHolder>
         <User>
           <Avatar alt="" src={userImage} />
-          <p>{player1.name}</p>
+          <p>{player1?.name}</p>
         </User>
         <Vs>VS</Vs>
         <User disabled={!isAccepted}>
           <Avatar alt="" src={userImage} />
-          <p>{player2.name}</p>
+          <p>{player2?.name}</p>
         </User>
       </UsersHolder>
       {!isAccepted && <GreyText>Waiting for user acceptance...</GreyText>}

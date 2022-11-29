@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import useDashboardQuestion from "../hooks/useDashboardQuestion";
 import {
   setDashboardQuestion,
+  setDashboardQuestionLabel,
   setDashboardQuestionOption,
 } from "../redux/reducers/dashboardQuestionSlice";
 import { CardDotLine, CardHeader, Card } from "./Card";
@@ -15,8 +16,7 @@ import {
 import IconButton from "./IconButton";
 import { RefreshCcw } from "react-feather";
 import RenderLatex from "./RenderLatex";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 
 export default function QuickPractice() {
   const dispatcher = useDispatch();
@@ -32,7 +32,7 @@ export default function QuickPractice() {
 
   useEffect(() => {
     const getData = async () => {
-      const { data } = await axios.get(`${HOST}/api/question/random`);
+      const { data } = await axios.get(`/api/question/random`);
       dispatcher(
         setDashboardQuestion({
           ...data,
@@ -48,19 +48,22 @@ export default function QuickPractice() {
   const handleOptionClick = (index) => {
     if (!touched) dispatcher(setDashboardQuestionOption(index));
   };
-  const abcd = ["A", "B", "C", "D"];
+  const abcd = ["A", "B", "C", "D", "E", "F", "G"];
 
   const handleRefresh = () => {
     const getData = async () => {
-      const { data } = await axios.get(`${HOST}/api/question/random`);
-      dispatcher(
-        setDashboardQuestion({
-          ...data,
-          correctIndex: data.correctAnswer,
-          selectedIndex: null,
-          touched: false,
-        })
-      );
+      dispatcher(setDashboardQuestionLabel("Loading..."));
+      const { data } = await axios.get(`/api/question/random`);
+      setTimeout(() => {
+        dispatcher(
+          setDashboardQuestion({
+            ...data,
+            correctIndex: data.correctAnswer,
+            selectedIndex: null,
+            touched: false,
+          })
+        );
+      }, 200);
     };
     getData();
   };
@@ -82,7 +85,10 @@ export default function QuickPractice() {
           </>
         }
       />
-      <CardDotLine beforeDot={subject} afterDot={chapter} />
+      <CardDotLine
+        beforeDot={label ? subject : "-"}
+        afterDot={label ? chapter : "-"}
+      />
       <Question>
         <QuestionLabel>
           <RenderLatex latex={label} />

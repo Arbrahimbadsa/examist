@@ -4,8 +4,10 @@ const Holder = styled.div`
   width: 100%;
   padding: 16px;
   overflow-x: scroll;
-  &::-webkit-scrollbar {
-    display: none;
+  @media only screen and (max-width: 600px) {
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 `;
 export default function DashboardContentContainer({ children }) {

@@ -35,31 +35,23 @@ import {
   setExamPrefix,
   setQuickExamCountD,
 } from "../redux/reducers/examCountSlice";
-import axios from "axios";
-import { HOST } from "../utils/hostname";
+import axios from "../api/axios";
 import useHeader from "../hooks/useHeader";
 import useUser from "../hooks/useUser";
 import convertToQM from "../utils/convertToQM";
+import PageTitle from "./PageTitle";
+import { showToast } from "../redux/reducers/toastSlice";
 
 const PastExamsHolder = styled.div`
   font-family: "Poppins", sans-serif;
   overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
   padding-bottom: 20px;
   @media only screen and (max-width: 600px) {
     padding-bottom: 100px;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
-`;
-const PageTitle = styled.div`
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  font-family: "Poppins", sans-serif;
-`;
-const PageIconHolder = styled.div`
-  margin-right: 5px;
 `;
 const ExamsCardHolder = styled.div`
   height: auto;
@@ -104,6 +96,7 @@ const CardSubtitleText = styled.p`
 `;
 const SubContent = styled.div`
   margin-bottom: 20px;
+  color: grey;
 `;
 const ExamInfoHolder = styled.div`
   height: auto;
@@ -131,10 +124,10 @@ const Button = styled.div`
   display: inline-block;
   font-size: 14px;
   cursor: pointer;
-  color: #187fe7;
   padding: 2px 10px;
   margin-right: 10px;
   border-radius: 4px;
+  color: ${(props) => (props.disabled ? "grey" : "#187fe7")};
   &:hover {
     background: rgba(0, 0, 255, 0.1);
   }
@@ -163,6 +156,7 @@ const Info = styled.p`
   font-size: 14px;
   color: grey;
 `;
+
 const PastExamCard = ({ exam }) => {
   const [actionsMenu, setActionsMenu] = useState(false);
 
@@ -199,7 +193,7 @@ const PastExamCard = ({ exam }) => {
   // delete past exam
   const handleDelete = async () => {
     await axios.post(
-      `${HOST}/api/past-exam/delete`,
+      `/api/past-exam/delete`,
       {
         id: exam._id,
         user: user?.id,
@@ -217,7 +211,7 @@ const PastExamCard = ({ exam }) => {
   return (
     <Card
       style={{
-        minHeight: "200px",
+        minHeight: "345px",
         height: "auto",
         position: "relative",
         marginBottom: "20px",
@@ -342,6 +336,7 @@ export default function PastExams() {
   const pastExams = useSelector((state) => state.pastExams.value);
   const totalPastExams = pastExams.length;
   const user = useUser();
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatcher = useDispatch();
 
@@ -351,8 +346,10 @@ export default function PastExams() {
   // fetch past exams
   useEffect(() => {
     const getData = async () => {
+      setIsLoading(true);
+      dispatcher(setPastExams([]));
       const { data } = await axios.post(
-        `${HOST}/api/past-exam/all`,
+        `/api/past-exam/all`,
         { id: user?.id },
         {
           headers,
@@ -366,27 +363,51 @@ export default function PastExams() {
         _data.questions = qs;
         newDataArr.push(_data);
       });
-      dispatcher(setPastExams(data));
+      setTimeout(() => {
+        dispatcher(setPastExams(data));
+        setIsLoading(false);
+      }, 0);
     };
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleDeleteAll = async () => {
+    await axios.post(
+      `/api/past-exam/deleteAll`,
+      { id: user?.id },
+      {
+        headers,
+      }
+    );
+    dispatcher(showToast("Past exam cleared."));
+    dispatcher(setPastExams([]));
+  };
+
   return (
     <PastExamsHolder>
-      <PageTitle>
-        <PageIconHolder>
-          <Edit2 size={15} />
-        </PageIconHolder>
-        <h3>Past Exams ({totalPastExams})</h3>
-      </PageTitle>
+      <PageTitle
+        icon={<Edit2 size={15} />}
+        title={`Past Exmas (${isLoading ? "..." : totalPastExams})`}
+        actions={
+          <>
+            <Button
+              disabled={isLoading || pastExams?.length === 0}
+              onClick={handleDeleteAll}
+            >
+              Delete All
+            </Button>
+          </>
+        }
+      />
       {pastExams && pastExams.length !== 0 && (
         <ExamsCardHolder>
           {pastExams &&
             pastExams.map((exam, i) => <PastExamCard key={i} exam={exam} />)}
         </ExamsCardHolder>
       )}
-      {pastExams && pastExams.length === 0 && (
+      {isLoading && <p>Loading...</p>}
+      {!isLoading && pastExams && pastExams.length === 0 && (
         <Info>Take an exam. Past exams are to be shown here.</Info>
       )}
     </PastExamsHolder>
