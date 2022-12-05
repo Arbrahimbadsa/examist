@@ -27,7 +27,7 @@ const userSlice = createSlice({
       deleteCookie("user");
       localStorage.removeItem("contentIndex");
       state.value = null;
-      state.value.auth = false;
+      console.log("lol");
     },
   },
 });

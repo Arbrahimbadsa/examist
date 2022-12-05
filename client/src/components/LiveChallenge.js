@@ -129,7 +129,11 @@ export default function LiveChallenge() {
           <p>{player2?.name}</p>
         </User>
       </UsersHolder>
-      {!isAccepted && <GreyText>Waiting for user acceptance...</GreyText>}
+      {!isAccepted && (
+        <GreyText style={{ marginTop: "10px" }}>
+          Waiting for user acceptance...
+        </GreyText>
+      )}
     </LiveChallengeHolder>
   );
 }

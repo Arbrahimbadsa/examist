@@ -13,6 +13,7 @@ import {
   setPlayer1,
   setPlayer2,
 } from "../redux/reducers/liveChallengeSlice";
+import useTheme from "../hooks/useTheme";
 
 const RedDot = styled.div`
   height: 12px;
@@ -103,6 +104,7 @@ export default function Notification() {
   const dispatcher = useDispatch();
   const currentUser = useUser();
   const socket = useSelector((state) => state.socket.value);
+  const theme = useTheme();
 
   const handleNotiClick = (noti) => {
     // handle challenge notis
@@ -126,7 +128,7 @@ export default function Notification() {
         }}
         style={{ position: "relative" }}
       >
-        <Bell color="black" size={20} />
+        <Bell color={theme.iconColor} size={20} />
         <RedDot show={isNewFound} />
       </IconButton>
       {show && <Backdrop onClick={() => setShow(false)} />}

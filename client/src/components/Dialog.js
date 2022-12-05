@@ -16,6 +16,8 @@ const DialogBoxContainer = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+  box-shadow: 0 0 24px 12px
+    var(--paper-dialog-shadow-color, rgba(0, 0, 0, 0.15));
   font-family: "Poppins", sans-serif;
   @media only screen and (max-width: 600px) {
     height: ${(props) => (props.small ? "auto" : "100vh")};
@@ -45,12 +47,12 @@ const Backdrop = styled.div`
   top: 0;
   left: 0;
   z-index: 99999999999999;
-  background: rgba(0, 0, 0, 0.8);
+  background: #000;
+  opacity: 0.5;
   height: 100vh;
   width: 100vw;
 `;
 const DialogBodyContainer = styled.div`
-  padding-top: 8px;
   ${(props) =>
     props.center &&
     `

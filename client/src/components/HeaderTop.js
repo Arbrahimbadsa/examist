@@ -109,7 +109,7 @@ const HeaderUserInfoHolder = styled.div`
   }
 `;
 const CategoryHolder = styled.div`
-  color: ${(props) => (props.active ? "#13b2ec" : "")};
+  color: ${(props) => (props.active ? "#13b2ec" : props.color)};
   font-size: ${(props) => (props.active ? "" : "15px")};
   transition: 0.1s;
   cursor: pointer;
@@ -131,6 +131,7 @@ const CategoryLabel = styled.p`
   margin: 0 10px;
   display: flex;
   align-items: center;
+  color: ${(props) => props.color};
 `;
 const HeaderOnPhoneHolder = styled.div`
   display: none;
@@ -160,9 +161,12 @@ const Flex = styled.div`
 `;
 
 const Category = ({ label, icon, active, onClick }) => {
+  const theme = useTheme();
   return (
-    <CategoryHolder onClick={onClick} active={active}>
-      <IconButton margin="0">{icon}</IconButton>
+    <CategoryHolder color={theme.textColor} onClick={onClick} active={active}>
+      <IconButton style={{ color: !active ? theme.textColor : "" }} margin="0">
+        {icon}
+      </IconButton>
       <CategoryLabel>{label}</CategoryLabel>
     </CategoryHolder>
   );
@@ -256,7 +260,7 @@ export default function HeaderTop() {
       <HeaderTopHolder color={theme.cardBg}>
         {isExamStarted && <HeaderHider />}
         <HeaderTopLeft>
-          <HeaderOnPhoneHolder>
+          <HeaderOnPhoneHolder style={{ color: theme.textColor }}>
             <MetaHolderOnPhone>
               <IconHolder
                 clickable={!isExamStarted}
@@ -290,7 +294,7 @@ export default function HeaderTop() {
         <HeaderTopRight>
           <Notification isNew={false} />
           <IconButton onClick={handleNewExam} margin="0">
-            <Plus color="black" size={20} />
+            <Plus color={theme.iconColor} size={20} />
           </IconButton>
           <Switcher />
           <HeaderUserInfoHolder
@@ -299,7 +303,9 @@ export default function HeaderTop() {
           >
             <Avatar alt="user" src={userImage} />
             <MetaHolder>
-              <UserName>{user?.name}</UserName>
+              <UserName style={{ color: theme.textColor }}>
+                {user?.name}
+              </UserName>
               <RankText>
                 <GreyText>Rank: 320</GreyText>
               </RankText>

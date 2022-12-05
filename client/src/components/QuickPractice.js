@@ -17,9 +17,13 @@ import IconButton from "./IconButton";
 import { RefreshCcw } from "react-feather";
 import RenderLatex from "./RenderLatex";
 import axios from "../api/axios";
+import useHeader from "../hooks/useHeader";
+import useUser from "../hooks/useUser";
 
 export default function QuickPractice() {
   const dispatcher = useDispatch();
+  const user = useUser();
+  const { headers } = useHeader();
   const {
     label,
     options,
@@ -32,18 +36,25 @@ export default function QuickPractice() {
 
   useEffect(() => {
     const getData = async () => {
-      const { data } = await axios.get(`/api/question/random`);
-      dispatcher(
-        setDashboardQuestion({
-          ...data,
-          correctIndex: data.correctAnswer,
-          selectedIndex: null,
-          touched: false,
-        })
-      );
+      if (user?.token) {
+        const h = {
+          Authorization: `Bearer ${user?.token}`,
+        };
+        const { data } = await axios.get(`/api/question/random`, {
+          headers: h,
+        });
+        dispatcher(
+          setDashboardQuestion({
+            ...data,
+            correctIndex: data.correctAnswer,
+            selectedIndex: null,
+            touched: false,
+          })
+        );
+      }
     };
     getData();
-  }, [dispatcher]);
+  }, [dispatcher, user]);
 
   const handleOptionClick = (index) => {
     if (!touched) dispatcher(setDashboardQuestionOption(index));
@@ -53,7 +64,7 @@ export default function QuickPractice() {
   const handleRefresh = () => {
     const getData = async () => {
       dispatcher(setDashboardQuestionLabel("Loading..."));
-      const { data } = await axios.get(`/api/question/random`);
+      const { data } = await axios.get(`/api/question/random`, { headers });
       setTimeout(() => {
         dispatcher(
           setDashboardQuestion({

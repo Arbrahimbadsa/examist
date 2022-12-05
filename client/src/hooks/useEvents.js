@@ -9,12 +9,14 @@ import {
   setIsLiveChallenge,
   setIsNegAllowed,
   setQuestions,
+  setShowExamPage,
   setTotalQuestions,
 } from "../redux/reducers/examSlice";
 import {
   setIsAccepted,
   setIsStarted,
   setPlayer2,
+  setPlayer1,
 } from "../redux/reducers/liveChallengeSlice";
 import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
 import {
@@ -24,10 +26,65 @@ import {
 import { showToast } from "../redux/reducers/toastSlice";
 import QuestionModel from "../utils/classes/QuestionModel";
 import formatLocalTime from "../utils/formatLocalTime";
+import useUser from "./useUser";
 
 export default function useEvents() {
   const socket = useSelector((state) => state.socket.value);
   const dispatcher = useDispatch();
+  const player1 = useSelector((state) => state.liveChallenge.player1);
+  const player2 = useSelector((state) => state.liveChallenge.player2);
+  const marks = useSelector((state) => state.exam.marks);
+  const answerSheet = useSelector((state) => state.exam.answerSheet);
+  const currentUser = useUser();
+
+  const getWinner = (marks) => {
+    if (player2?.status === "submitted") {
+      const player2examInfo = player2?.examInfo;
+      console.log("player 1 marks", marks);
+      console.log("player 2 marks", player2examInfo.marks);
+      let winner = "";
+      if (marks?.secured > player2examInfo.marks.secured) {
+        // player 1 wins
+        winner = 1;
+        dispatcher(
+          setPlayer1({
+            ...player1,
+            winner: true,
+          })
+        );
+      } else if (marks?.secured === player2examInfo.marks.secured) {
+        // it's a draw
+        winner = 0;
+        dispatcher(
+          setPlayer1({
+            ...player1,
+            winner: "draw",
+          })
+        );
+        dispatcher(
+          setPlayer2({
+            ...player2,
+            winner: "draw",
+          })
+        );
+      } else {
+        // player 2 wins
+        winner = 2;
+        dispatcher(
+          setPlayer2({
+            ...player2,
+            winner: true,
+          })
+        );
+      }
+      return winner;
+    } else {
+      console.log("player 1 marks", marks);
+      console.log("Player 2 hasn't submitted yet.");
+      return null;
+    }
+  };
+
   useEffect(() => {
     if (socket) {
       // this will fire for player 2
@@ -68,12 +125,136 @@ export default function useEvents() {
           setPlayer2({
             ...player2,
             status: "submitted",
+            examInfo: data?.examInfo,
           })
         );
       });
 
+      socket.on("player-1-win", (data) => {
+        const winner = data?.winner;
+        const loserExamInfo = data?.loser.examInfo;
+        const winnerExamInfo = data?.winner.examInfo;
+        if (winner.username === currentUser?.username) {
+          // player 1 win detected
+          dispatcher(
+            setPlayer1({
+              ...player1,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+          dispatcher(
+            setPlayer2({
+              ...player2,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+        } else {
+          // player 1 lose detected
+          dispatcher(
+            setPlayer1({
+              ...player1,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+          dispatcher(
+            setPlayer2({
+              ...player2,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+        }
+      });
+
+      socket.on("player-2-win", (data) => {
+        const winner = data?.winner;
+        const loserExamInfo = data?.loser.examInfo;
+        const winnerExamInfo = data?.winner.examInfo;
+        console.log(data);
+        if (winner.username === currentUser?.username) {
+          // player 1 win detected
+          dispatcher(
+            setPlayer1({
+              ...player1,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+          dispatcher(
+            setPlayer2({
+              ...player2,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+        } else {
+          // player 1 lose detected
+          dispatcher(
+            setPlayer1({
+              ...player1,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+          dispatcher(
+            setPlayer2({
+              ...player2,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            })
+          );
+        }
+      });
+
+      socket.on("draw-update", (data) => {
+        const players = [data?.players.player1, data?.players.player2];
+        players.forEach((player) => {
+          if (player.username === currentUser.username) {
+            dispatcher(
+              setPlayer1({
+                ...player1,
+                winner: "draw",
+                marks: player.examInfo.marks,
+                answerSheet: player.examInfo.answerSheet,
+                status: "submitted",
+              })
+            );
+          } else {
+            dispatcher(
+              setPlayer2({
+                ...player2,
+                winner: "draw",
+                marks: player.examInfo.marks,
+                answerSheet: player.examInfo.answerSheet,
+                status: "submitted",
+              })
+            );
+          }
+        });
+      });
+
       // this will fire after the countdown ends
       socket.on("start-exam", (data) => {
+        dispatcher(setShowExamPage(true));
         // live challenge starts from here.
         const exam = data;
         const questions = [];
@@ -106,8 +287,13 @@ export default function useEvents() {
       if (socket) {
         socket.off("send-challenge");
         socket.off("challenge-confirmed");
+        socket.off("player-1-win");
+        socket.off("player-2-win");
+        socket.off("draw-update");
+        socket.off("left-challenge");
+        socket.off("submit-challenge");
         socket.off("start-exam");
       }
     };
-  }, [socket, dispatcher]);
+  }, [socket, dispatcher, player1, player2, marks, answerSheet, currentUser]);
 }

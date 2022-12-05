@@ -20,6 +20,7 @@ import {
   setExamId,
   setExamTime,
   setIsCompleted,
+  setIsLiveChallenge,
   setMarks,
   setName,
   setOnlyResult,
@@ -41,6 +42,7 @@ import useUser from "../hooks/useUser";
 import convertToQM from "../utils/convertToQM";
 import PageTitle from "./PageTitle";
 import { showToast } from "../redux/reducers/toastSlice";
+import useTheme from "../hooks/useTheme";
 
 const PastExamsHolder = styled.div`
   font-family: "Poppins", sans-serif;
@@ -163,6 +165,7 @@ const PastExamCard = ({ exam }) => {
   const dispatcher = useDispatch();
   const { headers } = useHeader();
   const user = useUser();
+  const theme = useTheme();
 
   const handleViewResult = () => {
     dispatcher(setContentIndex(50));
@@ -173,6 +176,7 @@ const PastExamCard = ({ exam }) => {
     dispatcher(setMarks(exam.marks));
     dispatcher(setName(exam.name));
     dispatcher(setQuestions(exam.questions));
+    dispatcher(setIsLiveChallenge(exam.isLiveChallenge));
   };
 
   // retake past exam
@@ -256,7 +260,7 @@ const PastExamCard = ({ exam }) => {
                   setActionsMenu(false);
                 }}
               >
-                <Flex>
+                <Flex style={{ color: "black" }}>
                   <Edit2 style={{ marginRight: "5px" }} size={15} />
                   Retake
                 </Flex>
@@ -267,7 +271,7 @@ const PastExamCard = ({ exam }) => {
                   setActionsMenu(false);
                 }}
               >
-                <Flex>
+                <Flex style={{ color: "black" }}>
                   <Trash style={{ marginRight: "5px" }} size={15} />
                   Delete
                 </Flex>
@@ -294,28 +298,32 @@ const PastExamCard = ({ exam }) => {
           </ExamInfoHolder>
         )}
         <SubContent>
-          <CardSubtitle>
+          <CardSubtitle style={{ color: theme.textColor }}>
             <Clock style={{ marginRight: "5px" }} size={15} />
             Date & Time
           </CardSubtitle>
-          <CardSubtitleText>
+          <CardSubtitleText style={{ color: "grey" }}>
             On <b>{exam.time.on}</b> from <b>{exam.time.from}</b> to{" "}
             <b>{exam.time.to}</b>
           </CardSubtitleText>
         </SubContent>
         <SubContent>
-          <CardSubtitle>
+          <CardSubtitle style={{ color: theme.textColor }}>
             <Clock style={{ marginRight: "5px" }} size={15} />
             Duration
           </CardSubtitle>
-          <CardSubtitleText>{exam.time.is}</CardSubtitleText>
+          <CardSubtitleText style={{ color: "grey" }}>
+            {exam.time.is}
+          </CardSubtitleText>
         </SubContent>
         <SubContent>
-          <CardSubtitle>
+          <CardSubtitle style={{ color: theme.textColor }}>
             <List style={{ marginRight: "5px" }} size={15} />
             Questions
           </CardSubtitle>
-          <CardSubtitleText>{exam.questionsCount}</CardSubtitleText>
+          <CardSubtitleText style={{ color: "grey" }}>
+            {exam.questionsCount}
+          </CardSubtitleText>
         </SubContent>
         <SubContent style={{ marginBottom: "10px" }}>
           <ChipsHolder>
@@ -337,6 +345,7 @@ export default function PastExams() {
   const totalPastExams = pastExams.length;
   const user = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const theme = useTheme();
 
   const dispatcher = useDispatch();
 
@@ -355,6 +364,7 @@ export default function PastExams() {
           headers,
         }
       );
+      console.log(data);
       const newDataArr = [];
       data?.forEach((_data) => {
         const sheet = convertToQM(_data?.answerSheet, "full");
@@ -387,7 +397,7 @@ export default function PastExams() {
   return (
     <PastExamsHolder>
       <PageTitle
-        icon={<Edit2 size={15} />}
+        icon={<Edit2 color={theme.iconColor} size={15} />}
         title={`Past Exmas (${isLoading ? "..." : totalPastExams})`}
         actions={
           <>
@@ -406,7 +416,7 @@ export default function PastExams() {
             pastExams.map((exam, i) => <PastExamCard key={i} exam={exam} />)}
         </ExamsCardHolder>
       )}
-      {isLoading && <p>Loading...</p>}
+      {isLoading && !pastExams && <p>Loading...</p>}
       {!isLoading && pastExams && pastExams.length === 0 && (
         <Info>Take an exam. Past exams are to be shown here.</Info>
       )}

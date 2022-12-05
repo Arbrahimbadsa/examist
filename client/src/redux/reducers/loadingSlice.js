@@ -4,6 +4,7 @@ const loadingSlice = createSlice({
   initialState: {
     isGeneratingQuestion: false,
     isExamSubmitting: false,
+    areYouSure: false,
   },
   reducers: {
     setIsGeneratingQuestion: (state, action) => {
@@ -12,9 +13,12 @@ const loadingSlice = createSlice({
     setIsExamSubmitting: (state, action) => {
       state.isExamSubmitting = action.payload;
     },
+    setAreYouSure: (state, action) => {
+      state.areYouSure = action.payload;
+    },
   },
 });
 
-export const { setIsGeneratingQuestion, setIsExamSubmitting } =
+export const { setIsGeneratingQuestion, setIsExamSubmitting, setAreYouSure } =
   loadingSlice.actions;
 export default loadingSlice.reducer;

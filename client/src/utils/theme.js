@@ -5,6 +5,7 @@ const theme = {
     cardBg: "white",
     textColor: "black",
     cardHeaderColor: "black",
+    iconColor: "black",
     loginPage: {
       bg: "#101727",
       text: "#101727",
@@ -15,11 +16,12 @@ const theme = {
     },
   },
   dark: {
-    optionColor: "#13b2ec",
+    optionColor: "white",
     mainBg: "#23272f",
     cardBg: "#343a46",
     textColor: "white",
-    cardHeaderColor: "#13b2ec",
+    cardHeaderColor: "white",
+    iconColor: "white",
     loginPage: {
       bg: "#101727",
       text: "#101727",

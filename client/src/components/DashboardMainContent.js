@@ -1,5 +1,6 @@
 import { Home } from "react-feather";
 import styled from "styled-components";
+import useTheme from "../hooks/useTheme";
 import useUser from "../hooks/useUser";
 import { CardHeader, Card, CardContent } from "./Card";
 import Challenge from "./Challenge";
@@ -29,13 +30,14 @@ const PageIconHolder = styled.div`
 
 export default function DashboardMainContent() {
   const user = useUser();
+  const theme = useTheme();
   return (
     <>
       <PageTitle>
         <PageIconHolder>
-          <Home size={15} />
+          <Home size={15} color={theme.iconColor} />
         </PageIconHolder>
-        <h3>Hello, {user?.name}!</h3>
+        <h3 style={{ color: theme.textColor }}>Hello, {user?.name}!</h3>
       </PageTitle>
       <MainContent>
         <QuickPractice />

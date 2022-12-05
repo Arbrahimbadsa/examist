@@ -126,6 +126,7 @@ export default function LoginPage() {
           username,
           password,
         });
+        console.log(data);
         const user = {
           auth: true,
           name: data.name,
@@ -138,13 +139,13 @@ export default function LoginPage() {
         setIsSubmitting(false);
       })
       .catch((err) => {
+        setIsSubmitting(false);
         const error =
-          typeof err.response?.data.error === "object"
+          typeof err?.response?.data.error === "object"
             ? err?.message
-            : err.response?.data.error;
+            : err?.response?.data.error;
         const msg = error;
         setError(msg);
-        setIsSubmitting(false);
       });
   };
   const handleTest = () => {

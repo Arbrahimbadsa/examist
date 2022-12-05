@@ -38,6 +38,13 @@ const pastExamSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  isLiveChallenge: {
+    type: Boolean,
+    required: true,
+  },
+  liveExamPlayer: {
+    type: Object,
+  },
 });
 
 export const PastExam = mongoose.model("PastExam", pastExamSchema);

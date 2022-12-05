@@ -3,7 +3,7 @@ const questionRouter = express.Router();
 import { verify } from "../middleware/checkLogin.js";
 import { Question } from "../models/question.js";
 
-questionRouter.get("/random", async (req, res) => {
+questionRouter.get("/random", verify, async (req, res) => {
   const randomQuestion = await Question.aggregate([{ $sample: { size: 1 } }]);
   if (randomQuestion) {
     return res.status(201).json(randomQuestion[0]);

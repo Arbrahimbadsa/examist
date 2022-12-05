@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import useTheme from "../hooks/useTheme";
 const IconButtonHolder = styled.div`
   height: auto;
   width: auto;
@@ -19,8 +20,14 @@ const IconButtonHolder = styled.div`
 
 export default function IconButton({ children, margin, ...rest }) {
   const isExamStarted = useSelector((state) => state.isExamStarted.value);
+  const theme = useTheme();
   return (
-    <IconButtonHolder clickable={!isExamStarted} margin={margin} {...rest}>
+    <IconButtonHolder
+      style={{ color: theme.iconColor }}
+      clickable={!isExamStarted}
+      margin={margin}
+      {...rest}
+    >
       {children}
     </IconButtonHolder>
   );

@@ -141,14 +141,19 @@ export function QuestionOption({
           </OptionCount>
         )}
       </div>
-      <OptionTextWrapper>
+      <OptionTextWrapper style={{ color: theme.textColor }}>
         <RenderLatex latex={label} />
       </OptionTextWrapper>
     </OptionHolder>
   );
 }
 export function QuestionLabel({ children }) {
-  return <QuestionLabelHolder>{children}</QuestionLabelHolder>;
+  const theme = useTheme();
+  return (
+    <QuestionLabelHolder style={{ color: theme.textColor }}>
+      {children}
+    </QuestionLabelHolder>
+  );
 }
 export function QuestionOptions({ children }) {
   return <QuestionOptionsHolder>{children}</QuestionOptionsHolder>;

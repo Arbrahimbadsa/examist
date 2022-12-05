@@ -98,6 +98,7 @@ export default function Challenge() {
 
   useEffect(() => {
     socket?.on("users", (users) => {
+      console.log(users);
       setOnlineUsers(Object.values(users));
     });
     return () => {
@@ -115,7 +116,13 @@ export default function Challenge() {
         },
         to: user,
       });
-    dispatcher(setPlayer1(currentUser)); // save player one
+    dispatcher(
+      setPlayer1({
+        name: currentUser.name,
+        id: currentUser.id,
+        username: currentUser.username,
+      })
+    ); // save player one
     dispatcher(setPlayer2(user));
     setNewChallenge(false);
     dispatcher(setContentIndex(3)); // live challenge page
@@ -134,7 +141,9 @@ export default function Challenge() {
         <Info>
           {onlineUsers && onlineUsers.length - 1 === 0
             ? "Currently no users online."
-            : `Online users (${onlineUsers.length - 1})`}
+            : `Online users (${
+                onlineUsers.length - 1 < 0 ? "0" : onlineUsers.length - 1
+              })`}
         </Info>
         <UsersHolder>
           {onlineUsers &&
@@ -149,7 +158,7 @@ export default function Challenge() {
                   >
                     <Left>
                       <Avatar alt="" src={userImage} />
-                      <p style={{ marginLeft: "10px" }}>{user.username}</p>
+                      <p style={{ marginLeft: "10px" }}>{user.name}</p>
                     </Left>
                     <Right>
                       <Circle />
