@@ -96,10 +96,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   // effects
-  useEffect(() => {
-    if (auth) navigate("/dashboard");
-    else navigate("/login");
-  }, [auth, navigate]);
+  // useEffect(() => {
+  //   if (auth) navigate("/dashboard");
+  //   else navigate("/login");
+  // }, [auth, navigate]);
 
   useEffect(() => {
     console.log(auth);
@@ -107,7 +107,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // enable local host user update
-    dispatcher(updateUser());
+    //dispatcher(updateUser());
     // enable theme mode saving
     dispatcher(updateTheme());
   }, [dispatcher]);
@@ -137,6 +137,7 @@ export default function LoginPage() {
         };
         dispatcher(setUser(user));
         setIsSubmitting(false);
+        navigate("/dashboard");
       })
       .catch((err) => {
         setIsSubmitting(false);
@@ -161,51 +162,49 @@ export default function LoginPage() {
     );
   };
   return (
-    !auth && (
-      <Container theme={theme}>
-        <Logo phone dim={150} />
-        <LeftSide>
-          <LeftSideContent>
-            <Form id="login" onSubmit={handleSubmit}>
-              <TitleText topMargin>Welcome to Flame!</TitleText>
-              <GreyText>
-                Practice with tons of real questions. Trust your goals. Real
-                flame your skills.
-              </GreyText>
-              {error && <Error>{error}</Error>}
-              <Input
-                label="Username"
-                placeholder="Enter your username"
-                id="roll"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <Input
-                label="Password"
-                placeholder="Enter your password"
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button type="submit">
-                {isSubmitting ? "Logging..." : "Login"}
-              </Button>
-              <Button onClick={handleTest}>Test</Button>
-              <Link to="/register">
-                <GreyText>Click here to register.</GreyText>
-              </Link>
-            </Form>
-          </LeftSideContent>
-        </LeftSide>
-        <RightSide theme={theme}>
-          <Logo desktop dim={200} />
-          <BigText>Flame . Your . Skills</BigText>
-        </RightSide>
-      </Container>
-    )
+    <Container theme={theme}>
+      <Logo phone dim={150} />
+      <LeftSide>
+        <LeftSideContent>
+          <Form id="login" onSubmit={handleSubmit}>
+            <TitleText topMargin>Welcome to Flame!</TitleText>
+            <GreyText>
+              Practice with tons of real questions. Trust your goals. Real flame
+              your skills.
+            </GreyText>
+            {error && <Error>{error}</Error>}
+            <Input
+              label="Username"
+              placeholder="Enter your username"
+              id="roll"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <Input
+              label="Password"
+              placeholder="Enter your password"
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Button type="submit">
+              {isSubmitting ? "Logging..." : "Login"}
+            </Button>
+            <Button onClick={handleTest}>Test</Button>
+            <Link to="/register">
+              <GreyText>Click here to register.</GreyText>
+            </Link>
+          </Form>
+        </LeftSideContent>
+      </LeftSide>
+      <RightSide theme={theme}>
+        <Logo desktop dim={200} />
+        <BigText>Flame . Your . Skills</BigText>
+      </RightSide>
+    </Container>
   );
 }

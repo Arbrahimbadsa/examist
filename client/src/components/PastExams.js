@@ -43,6 +43,8 @@ import convertToQM from "../utils/convertToQM";
 import PageTitle from "./PageTitle";
 import { showToast } from "../redux/reducers/toastSlice";
 import useTheme from "../hooks/useTheme";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const PastExamsHolder = styled.div`
   font-family: "Poppins", sans-serif;
@@ -356,7 +358,7 @@ export default function PastExams() {
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);
-      dispatcher(setPastExams([]));
+      //dispatcher(setPastExams([]));
       const { data } = await axios.post(
         `/api/past-exam/all`,
         { id: user?.id },
@@ -364,7 +366,6 @@ export default function PastExams() {
           headers,
         }
       );
-      console.log(data);
       const newDataArr = [];
       data?.forEach((_data) => {
         const sheet = convertToQM(_data?.answerSheet, "full");
@@ -376,7 +377,7 @@ export default function PastExams() {
       setTimeout(() => {
         dispatcher(setPastExams(data));
         setIsLoading(false);
-      }, 0);
+      }, 500);
     };
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -410,13 +411,19 @@ export default function PastExams() {
           </>
         }
       />
-      {pastExams && pastExams.length !== 0 && (
+      {pastExams && pastExams.length !== 0 && !isLoading && (
         <ExamsCardHolder>
           {pastExams &&
             pastExams.map((exam, i) => <PastExamCard key={i} exam={exam} />)}
         </ExamsCardHolder>
       )}
-      {isLoading && !pastExams && <p>Loading...</p>}
+      {isLoading && (
+        <ExamsCardHolder style={{ gap: "30px" }}>
+          {pastExams.map((exam, i) => (
+            <Skeleton height="345px" width="350px" />
+          ))}
+        </ExamsCardHolder>
+      )}
       {!isLoading && pastExams && pastExams.length === 0 && (
         <Info>Take an exam. Past exams are to be shown here.</Info>
       )}

@@ -372,7 +372,7 @@ export default function QuestionPage() {
     setTimeout(() => {
       dispatcher(setIsExamSubmitting(false));
       addToPastExam(true, data.marks); // add to past exam - completed
-    }, 1000);
+    }, 100);
 
     // live challenge submitted by one user
     handleLiveChallenge("submit-challenge", {
@@ -564,11 +564,13 @@ export default function QuestionPage() {
             >
               <UserInfoHolder>
                 <Avatar src={userImage} alt="" />
-                <UserName>{player1?.name}</UserName>
+                <UserName style={{ color: theme.textColor }}>
+                  {player1?.name}
+                </UserName>
                 <GreyText>busy with exam</GreyText>
               </UserInfoHolder>
               <UserInfoHolder>
-                <b>VS</b>
+                <b style={{ color: theme.textColor }}>VS</b>
                 <p style={{ top: "5px", color: "red", fontSize: "12px" }}>
                   Live
                 </p>
@@ -582,7 +584,7 @@ export default function QuestionPage() {
                         ? "red"
                         : player2?.status === "submitted"
                         ? "#26d95f"
-                        : "black",
+                        : theme.textColor,
                   }}
                 >
                   {player2?.name}

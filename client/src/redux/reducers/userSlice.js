@@ -5,9 +5,7 @@ import setCookie from "../../utils/setCookie";
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    value: {
-      auth: true,
-    },
+    value: getCookie("user"),
   },
   reducers: {
     updateUser: (state) => {

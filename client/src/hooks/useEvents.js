@@ -17,6 +17,7 @@ import {
   setIsStarted,
   setPlayer2,
   setPlayer1,
+  setPastLiveChallenges,
 } from "../redux/reducers/liveChallengeSlice";
 import { setIsGeneratingQuestion } from "../redux/reducers/loadingSlice";
 import {
@@ -130,6 +131,10 @@ export default function useEvents() {
         );
       });
 
+      const addToPastLiveChallenge = (data) => {
+        dispatcher(setPastLiveChallenges(data));
+      };
+
       socket.on("player-1-win", (data) => {
         const winner = data?.winner;
         const loserExamInfo = data?.loser.examInfo;
@@ -154,6 +159,23 @@ export default function useEvents() {
               status: "submitted",
             })
           );
+          // add to past live challenges
+          addToPastLiveChallenge({
+            player1: {
+              ...player1,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            },
+            player2: {
+              ...player2,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            },
+          });
         } else {
           // player 1 lose detected
           dispatcher(
@@ -174,6 +196,23 @@ export default function useEvents() {
               status: "submitted",
             })
           );
+          // add to past live challenges
+          addToPastLiveChallenge({
+            player1: {
+              ...player1,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            },
+            player2: {
+              ...player2,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            },
+          });
         }
       });
 
@@ -202,6 +241,23 @@ export default function useEvents() {
               status: "submitted",
             })
           );
+          // add to past live challenges
+          addToPastLiveChallenge({
+            player1: {
+              ...player1,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            },
+            player2: {
+              ...player2,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            },
+          });
         } else {
           // player 1 lose detected
           dispatcher(
@@ -222,33 +278,54 @@ export default function useEvents() {
               status: "submitted",
             })
           );
+          // add to past live challenges
+          addToPastLiveChallenge({
+            player1: {
+              ...player1,
+              winner: false,
+              marks: loserExamInfo.marks,
+              answerSheet: loserExamInfo.answerSheet,
+              status: "submitted",
+            },
+            player2: {
+              ...player2,
+              winner: true,
+              marks: winnerExamInfo.marks,
+              answerSheet: winnerExamInfo.answerSheet,
+              status: "submitted",
+            },
+          });
         }
       });
 
       socket.on("draw-update", (data) => {
         const players = [data?.players.player1, data?.players.player2];
+        let p1;
+        let p2;
         players.forEach((player) => {
           if (player.username === currentUser.username) {
-            dispatcher(
-              setPlayer1({
-                ...player1,
-                winner: "draw",
-                marks: player.examInfo.marks,
-                answerSheet: player.examInfo.answerSheet,
-                status: "submitted",
-              })
-            );
+            p1 = {
+              ...player1,
+              winner: "draw",
+              marks: player.examInfo.marks,
+              answerSheet: player.examInfo.answerSheet,
+              status: "submitted",
+            };
+            dispatcher(setPlayer1(p1));
           } else {
-            dispatcher(
-              setPlayer2({
-                ...player2,
-                winner: "draw",
-                marks: player.examInfo.marks,
-                answerSheet: player.examInfo.answerSheet,
-                status: "submitted",
-              })
-            );
+            p2 = {
+              ...player2,
+              winner: "draw",
+              marks: player.examInfo.marks,
+              answerSheet: player.examInfo.answerSheet,
+              status: "submitted",
+            };
+            dispatcher(setPlayer2(p2));
           }
+        });
+        addToPastLiveChallenge({
+          player1: p1,
+          player2: p2,
         });
       });
 

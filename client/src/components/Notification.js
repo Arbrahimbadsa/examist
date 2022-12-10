@@ -110,7 +110,13 @@ export default function Notification() {
     // handle challenge notis
     if (noti.type === "challenge") {
       dispatcher(setContentIndex(3));
-      dispatcher(setPlayer1(currentUser));
+      dispatcher(
+        setPlayer1({
+          name: currentUser.name,
+          id: currentUser.id,
+          username: currentUser.username,
+        })
+      );
       dispatcher(setPlayer2(noti.sender));
       setShow(false);
       dispatcher(setIsAccepted(true));

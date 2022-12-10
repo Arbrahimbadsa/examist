@@ -94,12 +94,6 @@ export default function RegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // effects
-  useEffect(() => {
-    if (auth) navigate("/dashboard");
-    else navigate("/register");
-  }, [auth, navigate]);
-
   useEffect(() => {
     dispatcher(updateUser());
   }, [dispatcher]);
@@ -123,10 +117,11 @@ export default function RegistrationPage() {
           id: data.id,
           username: data.username,
           role: data.role,
-          image: userImage,
+          token: data.token,
         };
         dispatcher(setUser(user));
         setIsSubmitting(false);
+        navigate("/dashboard");
       })
       .catch((err) => {
         setError(err.message);
@@ -134,59 +129,57 @@ export default function RegistrationPage() {
       });
   };
   return (
-    !auth && (
-      <Container>
-        <Logo phone dim={150} />
-        <LeftSide>
-          <LeftSideContent>
-            <Form id="register" onSubmit={handleSubmit}>
-              <TitleText topMargin>Welcome to Flame!</TitleText>
-              <GreyText>
-                Practice with tons of real questions. Trust your goals. Real
-                flame your skills.
-              </GreyText>
-              {error && <Error>{error}</Error>}
-              <Input
-                label="Name"
-                placeholder="Enter your name"
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <Input
-                label="Username"
-                placeholder="Enter your username"
-                id="phone"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-              <Input
-                label="Password"
-                placeholder="Enter your password"
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <Button type="submit">
-                {isSubmitting ? "Registering..." : "Register"}
-              </Button>
-              <Link to="/login">
-                <GreyText>Click here to login.</GreyText>
-              </Link>
-            </Form>
-          </LeftSideContent>
-        </LeftSide>
-        <RightSide theme={theme}>
-          <Logo dim={200} desktop />
-          <BigText>Flame . Your . Skills</BigText>
-        </RightSide>
-      </Container>
-    )
+    <Container>
+      <Logo phone dim={150} />
+      <LeftSide>
+        <LeftSideContent>
+          <Form id="register" onSubmit={handleSubmit}>
+            <TitleText topMargin>Welcome to Flame!</TitleText>
+            <GreyText>
+              Practice with tons of real questions. Trust your goals. Real flame
+              your skills.
+            </GreyText>
+            {error && <Error>{error}</Error>}
+            <Input
+              label="Name"
+              placeholder="Enter your name"
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            <Input
+              label="Username"
+              placeholder="Enter your username"
+              id="phone"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <Input
+              label="Password"
+              placeholder="Enter your password"
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Button type="submit">
+              {isSubmitting ? "Registering..." : "Register"}
+            </Button>
+            <Link to="/login">
+              <GreyText>Click here to login.</GreyText>
+            </Link>
+          </Form>
+        </LeftSideContent>
+      </LeftSide>
+      <RightSide theme={theme}>
+        <Logo dim={200} desktop />
+        <BigText>Flame . Your . Skills</BigText>
+      </RightSide>
+    </Container>
   );
 }

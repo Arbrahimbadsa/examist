@@ -27,7 +27,7 @@ const theme = {
       text: "#101727",
     },
     dashboard: {
-      sidebarBg: "#101727",
+      sidebarBg: "#343a46",
       sidebarItemActive: "#13b2ec",
     },
   },

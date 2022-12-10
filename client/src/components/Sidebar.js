@@ -1,20 +1,20 @@
 import styled from "styled-components";
 import useTheme from "../hooks/useTheme";
-import { Grid, Edit2, BarChart } from "react-feather";
+import { Grid, Edit2, BarChart, ArrowLeft } from "react-feather";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setContentIndex,
   updateContentIndex,
 } from "../redux/reducers/contentIndexSlice";
-import Logo from "./Logo";
 import { useEffect } from "react";
 import useContentIndex from "../hooks/useContentIndex";
 import { useRef } from "react";
-import { setShowSidebar } from "../redux/reducers/sidebarSlice";
+import { setPcSidebar, setShowSidebar } from "../redux/reducers/sidebarSlice";
 import { useLayoutEffect } from "react";
 import useDim from "../hooks/useDim";
 import { useNavigate } from "react-router-dom";
+import IconButton from "./IconButton";
 
 const SidebarHolder = styled.div`
   background: ${(props) => props.theme.sidebarBg};
@@ -42,16 +42,17 @@ const SidebarHider = styled.div`
   position: absolute;
 `;
 const SidebarHeader = styled.div`
-  display: inline-block;
+  display: flex;
   height: auto;
   width: 100%;
-`;
-const SidebarHeaderText = styled.p`
-  margin: 20px 0 10px 20px;
-  display: flex;
+  height: 55px;
   align-items: center;
+  padding: 0 16px;
+`;
+const SidebarHeaderText = styled.div`
   font-weight: bold;
   font-size: 20px;
+  width: 100%;
 `;
 const SidebarItemsHolder = styled.div`
   flex-grow: 2;
@@ -91,6 +92,12 @@ const FlameText = styled.span`
     cursor: default;
   }
 `;
+const Flex = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
 
 const SidebarItem = ({ label, icon, active, onClick }) => {
   const theme = useTheme("dashboard");
@@ -105,12 +112,14 @@ const SidebarItem = ({ label, icon, active, onClick }) => {
 export default function Sidebar() {
   const sidebarRef = useRef();
   const showSidebar = useSelector((state) => state.showSidebar.value);
+  const pcSidebar = useSelector((state) => state.showSidebar.pcSidebar);
   const isExamStarted = useSelector((state) => state.isExamStarted.value);
   const theme = useTheme("dashboard");
   const contentIndex = useContentIndex();
   const dispatcher = useDispatch();
   const navigate = useNavigate();
   const isPc = useDim();
+
   const [items] = useState([
     { label: "Dashboard", icon: <Grid size={20} />, route: "/dashboard" },
     { label: "Past Exams", icon: <Edit2 size={20} />, route: "past-exams" },
@@ -120,15 +129,18 @@ export default function Sidebar() {
       route: "performance",
     },
   ]);
+
   const handleItemClick = (id) => {
     if (!isExamStarted) {
       dispatcher(setContentIndex(id));
       dispatcher(setShowSidebar(false));
     }
   };
+
   useEffect(() => {
     dispatcher(updateContentIndex());
   }, [dispatcher]);
+
   useLayoutEffect(() => {
     if (!isPc) {
       if (showSidebar !== null) {
@@ -140,6 +152,23 @@ export default function Sidebar() {
       }
     }
   }, [showSidebar, isPc]);
+
+  useLayoutEffect(() => {
+    if (isPc) {
+      if (pcSidebar) {
+        sidebarRef.current.style.transform = "translate(-220px, 0px)";
+        sidebarRef.current.style.display = "none";
+      } else {
+        sidebarRef.current.style.transform = "translate(0px, 0px)";
+        sidebarRef.current.style.display = "block";
+      }
+    }
+  }, [pcSidebar, isPc]);
+
+  const handleBackClick = () => {
+    dispatcher(setPcSidebar(!pcSidebar));
+  };
+
   return (
     <>
       <Backdrop
@@ -150,8 +179,16 @@ export default function Sidebar() {
         {isExamStarted && <SidebarHider />}
         <SidebarHeader>
           <SidebarHeaderText>
-            <Logo dim={40} />
-            <FlameText onClick={() => navigate("/dashboard")}>Flame</FlameText>
+            <Flex>
+              <FlameText onClick={() => navigate("/dashboard")}>
+                Flame
+              </FlameText>
+              {isPc && (
+                <IconButton margin="0" onClick={handleBackClick}>
+                  <ArrowLeft color="white" size={20} />
+                </IconButton>
+              )}
+            </Flex>
           </SidebarHeaderText>
         </SidebarHeader>
         <SidebarItemsHolder>

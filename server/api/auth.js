@@ -56,49 +56,53 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/register", async (req, res) => {
-  const { name, username, password } = req.body;
-  if (name && username && password) {
-    const alreadyExist = await User.findOne({ username }).exec();
-    if (alreadyExist) {
-      return res.status(500).json({
-        error: "User already exists!",
-      });
-    } else {
-      const encryptedPassword = await bcrypt.hash(password, 10);
+  try {
+    const { name, username, password } = req.body;
+    if (name && username && password) {
+      const alreadyExist = await User.findOne({ username }).exec();
+      if (alreadyExist) {
+        return res.status(500).json({
+          error: "User already exists!",
+        });
+      } else {
+        const encryptedPassword = await bcrypt.hash(password, 10);
 
-      const user = new User({
-        name,
-        username,
-        password: encryptedPassword,
-        role: "general",
-      });
-      const token = jwt.sign(
-        { username, id: user._id, role: user.role },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
-      );
-      user.save((err) => {
-        if (err) {
-          return res.status(401).json({
-            error: "Something went wrong.",
-          });
-        } else {
-          return res.status(200).json({
-            name: user.name,
-            username: user.username,
-            id: user._id,
-            token,
-            role: user.role,
-          });
-        }
+        const user = new User({
+          name,
+          username,
+          password: encryptedPassword,
+          role: "general",
+        });
+        const token = jwt.sign(
+          { username, id: user._id, role: user.role },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "2h",
+          }
+        );
+        user.save((err) => {
+          if (err) {
+            return res.status(401).json({
+              error: "Something went wrong.",
+            });
+          } else {
+            return res.status(200).json({
+              name: user.name,
+              username: user.username,
+              id: user._id,
+              token,
+              role: user.role,
+            });
+          }
+        });
+      }
+    } else {
+      return res.status(500).json({
+        error: "Something went wrong.",
       });
     }
-  } else {
-    return res.status(401).json({
-      error: "Something went wrong.",
-    });
+  } catch (error) {
+    console.log(error);
   }
 });
 

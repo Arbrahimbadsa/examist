@@ -80,7 +80,11 @@ export default function QuickPractice() {
   };
 
   return (
-    <Card>
+    <Card
+      style={{
+        maxHeight: "auto !important",
+      }}
+    >
       <CardHeader
         title="Quick Practice"
         actions={

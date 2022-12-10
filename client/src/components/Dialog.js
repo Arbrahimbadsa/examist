@@ -1,5 +1,6 @@
 import { X } from "react-feather";
 import styled from "styled-components";
+import useTheme from "../hooks/useTheme";
 const DialogBoxContainer = styled.div`
   height: ${(props) => (props.small ? "auto" : "400px")};
   width: ${(props) => (props.small ? "400px" : "900px")};
@@ -69,10 +70,16 @@ export function DialogBody({ children, ...rest }) {
   return <DialogBodyContainer {...rest}>{children}</DialogBodyContainer>;
 }
 export function Dialog({ children, show, title, onClose, small, ...rest }) {
+  const theme = useTheme();
   return (
     <>
       {show && <Backdrop onClick={onClose} />}
-      <DialogBoxContainer show={show} small={small} {...rest}>
+      <DialogBoxContainer
+        style={{ background: `${theme.mainBg} !important` }}
+        show={show}
+        small={small}
+        {...rest}
+      >
         <DialogHeader>
           <div>{title}</div>
           <div style={{ cursor: "pointer" }} onClick={onClose}>

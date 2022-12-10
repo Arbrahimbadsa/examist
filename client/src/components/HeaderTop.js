@@ -21,7 +21,7 @@ import { switchTheme } from "../redux/reducers/themeSlice";
 import { Menu, MenuItem } from "./Menu";
 import { logout } from "../redux/reducers/userSlice";
 import Logo from "./Logo";
-import { setShowSidebar } from "../redux/reducers/sidebarSlice";
+import { setPcSidebar, setShowSidebar } from "../redux/reducers/sidebarSlice";
 import IconButton from "./IconButton";
 import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { disableContent } from "../redux/reducers/disableContentSlice";
@@ -31,6 +31,7 @@ import useUser from "../hooks/useUser";
 import Notification from "./Notification";
 import { clearPastExams } from "../redux/reducers/pastExamSlice";
 import useTheme from "../hooks/useTheme";
+import useDim from "../hooks/useDim";
 
 const HeaderTopHolder = styled.div`
   background: ${(props) => props.color};
@@ -198,32 +199,34 @@ export default function HeaderTop() {
       icon: <Plus size={15} />,
       route: "new-exam",
     },
-    {
-      label: "Leaderboard",
-      icon: <Users size={15} />,
-      route: "leaderboard",
-    },
-    {
-      label: "Analytics",
-      icon: <PieChart size={15} />,
-      route: "analytics",
-    },
-    {
-      label: "Settings",
-      icon: <Settings size={15} />,
-      route: "settings",
-    },
-    {
-      label: "Info",
-      icon: <Info size={15} />,
-      route: "info",
-    },
+    // {
+    //   label: "Leaderboard",
+    //   icon: <Users size={15} />,
+    //   route: "leaderboard",
+    // },
+    // {
+    //   label: "Analytics",
+    //   icon: <PieChart size={15} />,
+    //   route: "analytics",
+    // },
+    // {
+    //   label: "Settings",
+    //   icon: <Settings size={15} />,
+    //   route: "settings",
+    // },
+    // {
+    //   label: "Info",
+    //   icon: <Info size={15} />,
+    //   route: "info",
+    // },
   ]);
   const [activeCategory, setActiveCategory] = useState(0);
   const [userMenu, setUserMenu] = useState(false);
   const [newExam, setNewExam] = useState(false);
+  const pcSidebar = useSelector((state) => state.showSidebar.pcSidebar);
   const navigate = useNavigate();
   const theme = useTheme();
+  const isPc = useDim();
   const handleNewExam = () =>
     !isExamStarted && setNewExam(!newExam) && !isGeneratingQuestion;
   const goHome = () => {
@@ -274,6 +277,14 @@ export default function HeaderTop() {
               <TitleOnPhone onClick={goHome}>Flame</TitleOnPhone>
             </MetaHolderOnPhone>
           </HeaderOnPhoneHolder>
+          {isPc && pcSidebar && (
+            <IconButton
+              onClick={() => dispatcher(setPcSidebar(false))}
+              margin="0 20px 0 0"
+            >
+              <Humbarger color={theme.iconColor} size={20} />
+            </IconButton>
+          )}
           {categories &&
             categories.map((category, i) => (
               <Category
