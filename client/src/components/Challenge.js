@@ -1,4 +1,4 @@
-import { Card, CardDotLine, CardHeader } from "./Card";
+import { CardDotLine, CardHeader } from "./Card";
 import IconButton from "./IconButton";
 import styled from "styled-components";
 import { Plus } from "react-feather";
@@ -105,19 +105,6 @@ const UserName = styled.div`
   font-size: 13px;
   font-weight: bold;
   margin-top: 5px;
-`;
-const ViewResultButton = styled.button`
-  color: #fff;
-  background: #26d95f;
-  border: none;
-  border-radius: 10px;
-  padding: 5px 15px;
-  cursor: pointer;
-  @media only screen and (max-width: 600px) {
-    cursor: default;
-  }
-  margin-top: 5px;
-  margin-right: 8px;
 `;
 
 const ChallengesHolder = styled.div``;

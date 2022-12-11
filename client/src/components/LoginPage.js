@@ -10,7 +10,6 @@ import useTheme from "../hooks/useTheme";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/reducers/userSlice";
-import { updateUser } from "../redux/reducers/userSlice";
 import { updateTheme } from "../redux/reducers/themeSlice";
 import Logo from "./Logo";
 import { object, string } from "yup";

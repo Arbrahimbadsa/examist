@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
 import GreyText from "./GreyText";
 import TitleText from "./TitleText";
 import Input from "./Input";
@@ -13,7 +12,6 @@ import { useEffect } from "react";
 import Logo from "./Logo";
 import { string, object } from "yup";
 import axios from "../api/axios";
-import userImage from "../assets/user-11.jpg";
 import { updateUser } from "../redux/reducers/userSlice";
 
 const Container = styled.div`
@@ -85,7 +83,6 @@ const registrationSchema = object({
 
 export default function RegistrationPage() {
   const theme = useTheme();
-  const auth = useAuth();
   const navigate = useNavigate();
   const dispatcher = useDispatch();
   const [name, setName] = useState("");
