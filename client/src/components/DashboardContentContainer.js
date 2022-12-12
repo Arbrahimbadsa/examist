@@ -8,6 +8,7 @@ const Holder = styled.div`
     &::-webkit-scrollbar {
       display: none;
     }
+    padding: 16px 8px 16px 8px;
   }
 `;
 export default function DashboardContentContainer({ children }) {

@@ -139,6 +139,21 @@ export default function Challenge() {
 
   const theme = useTheme();
 
+  const getEasyName = (str) => {
+    let result = "";
+    if (str) {
+      const arr = str.split(" ");
+      if (arr.length > 1) {
+        result = arr[0] + " " + arr[1][0] + ".";
+      } else {
+        result = str + ".";
+      }
+    } else {
+      result = str;
+    }
+    return result;
+  };
+
   useEffect(() => {
     if (user?.id) {
       const getData = async () => {
@@ -392,7 +407,7 @@ export default function Challenge() {
                         : "#FF0400",
                     }}
                   >
-                    {plc.player1?.name}
+                    {getEasyName(plc.player1?.name)}
                   </UserName>
 
                   {plc.player2?.status !== "left" && (
@@ -472,7 +487,7 @@ export default function Challenge() {
                         : "#FF0400",
                     }}
                   >
-                    {plc.player2?.name}
+                    {getEasyName(plc.player2?.name)}
                   </UserName>
 
                   <GreyText
