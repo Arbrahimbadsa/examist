@@ -12,7 +12,7 @@ const DashboardHolder = styled.div`
   display: flex;
 `;
 // socket initialization
-const socket = io("localhost:5000", { autoConnect: false });
+const socket = io("https://flame-api.onrender.com", { autoConnect: false });
 
 export default function Dashboard() {
   const dispatcher = useDispatch();
