@@ -9,11 +9,10 @@ import DashboardAnalytics from "./DashboardAnalytics";
 import QuickPractice from "./QuickPractice";
 const MainContent = styled.div`
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 16px;
   @media only screen and (max-width: 600px) {
-    grid-template-columns: 1fr;
+    display: block;
   }
   font-family: "Poppins", sans-serif;
   padding-bottom: 65px;
@@ -26,6 +25,9 @@ const PageTitle = styled.div`
 `;
 const PageIconHolder = styled.div`
   margin-right: 5px;
+`;
+const FlexChild = styled.div`
+  width: 100%;
 `;
 
 export default function DashboardMainContent() {
@@ -40,14 +42,18 @@ export default function DashboardMainContent() {
         <h3 style={{ color: theme.textColor }}>Hello, {user?.name}!</h3>
       </PageTitle>
       <MainContent>
-        <QuickPractice />
-        <Challenge />
-        <Card centered={true}>
-          <CardHeader title="Analytics" />
-          <CardContent>
-            <DashboardAnalytics />
-          </CardContent>
-        </Card>
+        <FlexChild>
+          <QuickPractice />
+          <Card style={{ maxWidth: "auto", marginTop: "16px" }} centered={true}>
+            <CardHeader title="Analytics" />
+            <CardContent>
+              <DashboardAnalytics />
+            </CardContent>
+          </Card>
+        </FlexChild>
+        <FlexChild>
+          <Challenge />
+        </FlexChild>
       </MainContent>
     </>
   );

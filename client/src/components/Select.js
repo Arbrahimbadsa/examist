@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "react-feather";
 import styled from "styled-components";
+import useTheme from "../hooks/useTheme";
 const SelectHolder = styled.div`
   margin: ${(props) => props.margin};
 `;
@@ -100,6 +101,7 @@ export default function Select({
   const [showOptions, setShowOptions] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const handleOptionsShow = () => setShowOptions(!showOptions);
+  const theme = useTheme();
   const handleOptionClick = (option) => {
     if (!multipleChoice) {
       onChange(option);
@@ -122,7 +124,7 @@ export default function Select({
   }, [selected]);
   return (
     <SelectHolder {...rest}>
-      <Label>{label}</Label>
+      <Label style={{ color: theme.textColor }}>{label}</Label>
       <StyledSelect onClick={handleOptionsShow}>
         <DefaultTextHolder>
           {multipleChoice ? (

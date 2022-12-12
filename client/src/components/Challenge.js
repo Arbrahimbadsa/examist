@@ -12,6 +12,9 @@ import { setContentIndex } from "../redux/reducers/contentIndexSlice";
 import { setPlayer1, setPlayer2 } from "../redux/reducers/liveChallengeSlice";
 import GreyText from "./GreyText";
 import useTheme from "../hooks/useTheme";
+import axios from "../api/axios";
+import { setPastLiveChallenges } from "../redux/reducers/liveChallengeSlice";
+import Skeleton from "react-loading-skeleton";
 
 const UsersHolder = styled.div`
   padding: 0 120px;
@@ -107,7 +110,11 @@ const UserName = styled.div`
   margin-top: 5px;
 `;
 
-const ChallengesHolder = styled.div``;
+const ChallengesHolder = styled.div`
+  @media only screen and (max-width: 600px) {
+    padding-top: 16px;
+  }
+`;
 const ChallengesHolderHeader = styled.div`
   background: #fff;
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
@@ -122,6 +129,8 @@ export default function Challenge() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const currentUser = useUser();
   const dispatcher = useDispatch();
+  const user = useUser();
+  const [isLoading, setIsLoading] = useState(null);
 
   // states (redux)
   const pastLiveChallenges = useSelector(
@@ -129,6 +138,113 @@ export default function Challenge() {
   );
 
   const theme = useTheme();
+
+  useEffect(() => {
+    if (user?.id) {
+      const getData = async () => {
+        setIsLoading(true);
+        const resultArray = [];
+        const { data: challenges } = await axios.get(
+          `/api/live-challenge/all/${user.id}`
+        );
+        console.log(challenges);
+        challenges &&
+          challenges.forEach((c) => {
+            const p1 = c.players[0];
+            const p2 = c.players[1];
+            let player1, player2;
+            if (p1.examInfo.marks.secured > p2.examInfo.marks.secured) {
+              if (p1.id === user.id) {
+                player1 = {
+                  name: p1.name,
+                  username: p1.username,
+                  id: p1.id,
+                  winner: true,
+                  marks: p1.examInfo.marks,
+                  answerSheet: p1.examInfo.answerSheet,
+                  status: "submitted",
+                };
+                player2 = {
+                  name: p2.name,
+                  username: p2.username,
+                  id: p2.id,
+                  winner: false,
+                  marks: p2.examInfo.marks,
+                  answerSheet: p2.examInfo.answerSheet,
+                  status: "submitted",
+                };
+              } else {
+                player2 = {
+                  name: p1.name,
+                  username: p1.username,
+                  id: p1.id,
+                  winner: true,
+                  marks: p1.examInfo.marks,
+                  answerSheet: p1.examInfo.answerSheet,
+                  status: "submitted",
+                };
+                player1 = {
+                  name: p2.name,
+                  username: p2.username,
+                  id: p2.id,
+                  winner: false,
+                  marks: p2.examInfo.marks,
+                  answerSheet: p2.examInfo.answerSheet,
+                  status: "submitted",
+                };
+              }
+            } else {
+              if (p2.id === user.id) {
+                player1 = {
+                  name: p2.name,
+                  username: p2.username,
+                  id: p2.id,
+                  winner: true,
+                  marks: p2.examInfo.marks,
+                  answerSheet: p2.examInfo.answerSheet,
+                  status: "submitted",
+                };
+                player2 = {
+                  name: p1.name,
+                  username: p1.username,
+                  id: p1.id,
+                  winner: false,
+                  marks: p1.examInfo.marks,
+                  answerSheet: p1.examInfo.answerSheet,
+                  status: "submitted",
+                };
+              } else {
+                player2 = {
+                  name: p1.name,
+                  username: p1.username,
+                  id: p1.id,
+                  winner: true,
+                  marks: p1.examInfo.marks,
+                  answerSheet: p1.examInfo.answerSheet,
+                  status: "submitted",
+                };
+                player1 = {
+                  name: p2.name,
+                  username: p2.username,
+                  id: p2.id,
+                  winner: false,
+                  marks: p2.examInfo.marks,
+                  answerSheet: p2.examInfo.answerSheet,
+                  status: "submitted",
+                };
+              }
+            }
+            if (challenges) resultArray.push({ player1, player2 });
+          });
+        setTimeout(() => {
+          if (challenges.length !== 0)
+            dispatcher(setPastLiveChallenges(resultArray));
+          setIsLoading(false);
+        }, 0);
+      };
+      getData();
+    }
+  }, [user, dispatcher]);
 
   useEffect(() => {
     socket?.emit("get-users");
@@ -225,11 +341,25 @@ export default function Challenge() {
             afterDot={pastLiveChallenges && pastLiveChallenges.length}
           />
         </ChallengesHolderHeader>
-        {pastLiveChallenges && pastLiveChallenges.length === 0 && (
-          <GreyText>No recent challenges.</GreyText>
-        )}
+        {isLoading === false &&
+          pastLiveChallenges &&
+          pastLiveChallenges.length === 0 && (
+            <ChallengesHolderHeader
+              style={{ marginTop: "16px", background: theme.cardBg }}
+            >
+              <GreyText>No recent challenges.</GreyText>
+            </ChallengesHolderHeader>
+          )}
         <ChallengeHolder>
-          {pastLiveChallenges &&
+          {isLoading && (
+            <>
+              <Skeleton style={{ marginTop: "16px" }} height={100} />
+              <Skeleton style={{ marginTop: "16px" }} height={100} />
+              <Skeleton style={{ marginTop: "16px" }} height={100} />
+            </>
+          )}
+          {!isLoading &&
+            pastLiveChallenges &&
             pastLiveChallenges.map((plc, i) => (
               <ExamHeaderHolder
                 key={i}
@@ -283,8 +413,8 @@ export default function Challenge() {
                             ? "Winner"
                             : "Work hard"}{" "}
                           <b>
-                            {plc.player1?.marks.secured} /{" "}
-                            {plc.player1?.answerSheet.length}
+                            ({plc.player1?.marks.secured} /{" "}
+                            {plc.player1?.answerSheet.length})
                           </b>
                         </>
                       ) : plc.player1?.status === "left" ? (
@@ -362,8 +492,8 @@ export default function Challenge() {
                           ? "Winner"
                           : "Work hard"}{" "}
                         <b>
-                          {plc.player2?.examInfo.marks.secured} /{" "}
-                          {plc.player2?.examInfo.answerSheet.length}
+                          ({plc.player2?.marks.secured} /{" "}
+                          {plc.player2?.answerSheet.length})
                         </b>
                       </>
                     ) : plc.player2?.status === "left" ? (

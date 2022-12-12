@@ -377,7 +377,7 @@ export default function PastExams() {
       setTimeout(() => {
         dispatcher(setPastExams(data));
         setIsLoading(false);
-      }, 500);
+      }, 0);
     };
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -419,9 +419,9 @@ export default function PastExams() {
       )}
       {isLoading && (
         <ExamsCardHolder style={{ gap: "30px" }}>
-          {pastExams.map((exam, i) => (
-            <Skeleton height="345px" width="350px" />
-          ))}
+          <Skeleton height="345px" width="350px" />
+          <Skeleton height="345px" width="350px" />
+          <Skeleton height="345px" width="350px" />
         </ExamsCardHolder>
       )}
       {!isLoading && pastExams && pastExams.length === 0 && (

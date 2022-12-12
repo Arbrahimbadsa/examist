@@ -28,6 +28,7 @@ import { showToast } from "../redux/reducers/toastSlice";
 import QuestionModel from "../utils/classes/QuestionModel";
 import formatLocalTime from "../utils/formatLocalTime";
 import useUser from "./useUser";
+import axios from "../api/axios";
 
 export default function useEvents() {
   const socket = useSelector((state) => state.socket.value);
@@ -37,54 +38,6 @@ export default function useEvents() {
   const marks = useSelector((state) => state.exam.marks);
   const answerSheet = useSelector((state) => state.exam.answerSheet);
   const currentUser = useUser();
-
-  const getWinner = (marks) => {
-    if (player2?.status === "submitted") {
-      const player2examInfo = player2?.examInfo;
-      console.log("player 1 marks", marks);
-      console.log("player 2 marks", player2examInfo.marks);
-      let winner = "";
-      if (marks?.secured > player2examInfo.marks.secured) {
-        // player 1 wins
-        winner = 1;
-        dispatcher(
-          setPlayer1({
-            ...player1,
-            winner: true,
-          })
-        );
-      } else if (marks?.secured === player2examInfo.marks.secured) {
-        // it's a draw
-        winner = 0;
-        dispatcher(
-          setPlayer1({
-            ...player1,
-            winner: "draw",
-          })
-        );
-        dispatcher(
-          setPlayer2({
-            ...player2,
-            winner: "draw",
-          })
-        );
-      } else {
-        // player 2 wins
-        winner = 2;
-        dispatcher(
-          setPlayer2({
-            ...player2,
-            winner: true,
-          })
-        );
-      }
-      return winner;
-    } else {
-      console.log("player 1 marks", marks);
-      console.log("Player 2 hasn't submitted yet.");
-      return null;
-    }
-  };
 
   useEffect(() => {
     if (socket) {
@@ -131,8 +84,15 @@ export default function useEvents() {
         );
       });
 
-      const addToPastLiveChallenge = (data) => {
+      const addToPastLiveChallenge = async (data) => {
         dispatcher(setPastLiveChallenges(data));
+      };
+
+      const addPastLiveChallengeToDB = async (data) => {
+        const liveChallenge = await axios.post("/api/live-challenge/add", {
+          data,
+        });
+        console.log(liveChallenge);
       };
 
       socket.on("player-1-win", (data) => {
@@ -160,6 +120,7 @@ export default function useEvents() {
             })
           );
           // add to past live challenges
+          addPastLiveChallengeToDB({ players: [winner, data?.loser] });
           addToPastLiveChallenge({
             player1: {
               ...player1,
@@ -242,6 +203,7 @@ export default function useEvents() {
             })
           );
           // add to past live challenges
+          addPastLiveChallengeToDB({ players: [winner, data?.loser] });
           addToPastLiveChallenge({
             player1: {
               ...player1,
@@ -312,6 +274,7 @@ export default function useEvents() {
               status: "submitted",
             };
             dispatcher(setPlayer1(p1));
+            addPastLiveChallengeToDB({ players: data?.players });
           } else {
             p2 = {
               ...player2,

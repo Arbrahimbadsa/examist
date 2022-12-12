@@ -32,6 +32,7 @@ import Notification from "./Notification";
 import { clearPastExams } from "../redux/reducers/pastExamSlice";
 import useTheme from "../hooks/useTheme";
 import useDim from "../hooks/useDim";
+import { clearLiveExamSlice } from "../redux/reducers/liveChallengeSlice";
 
 const HeaderTopHolder = styled.div`
   background: ${(props) => props.color};
@@ -243,6 +244,7 @@ export default function HeaderTop() {
     setUserMenu(false);
     dispatcher(logout());
     dispatcher(clearPastExams());
+    dispatcher(clearLiveExamSlice());
     socket && socket.disconnect();
   };
 
@@ -322,7 +324,7 @@ export default function HeaderTop() {
               </RankText>
             </MetaHolder>
             <ChevronHolder>
-              <ChevronDown size={20} />
+              <ChevronDown style={{ color: theme.textColor }} size={20} />
             </ChevronHolder>
           </HeaderUserInfoHolder>
           <Menu

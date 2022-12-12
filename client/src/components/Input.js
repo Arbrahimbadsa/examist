@@ -19,7 +19,7 @@ const InputHolder = styled.div`
   margin: ${(props) => (props.margin ? props.margin : "20px 0")};
 `;
 const Label = styled.label`
-  color: ${(props) => props.theme.loginPage.text};
+  color: ${(props) => props.theme.textColor};
   margin-bottom: 5px;
   display: block;
 `;

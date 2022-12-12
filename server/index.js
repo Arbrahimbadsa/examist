@@ -9,6 +9,7 @@ import questionRouter from "./api/question.js";
 import "colors";
 import { connectMongoDB } from "./config/db.js";
 import pastExamRouter from "./api/pastExam.js";
+import liveChallengeRouter from "./api/liveChallenge.js";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ connectMongoDB();
 app.use("/api/user", authRouter);
 app.use("/api/question", questionRouter);
 app.use("/api/past-exam", pastExamRouter);
+app.use("/api/live-challenge", liveChallengeRouter);
 
 // register middlewear and setup
 io.use(applySocketMiddlewear);

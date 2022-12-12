@@ -4,7 +4,7 @@ import useTheme from "../hooks/useTheme";
 const DialogBoxContainer = styled.div`
   height: ${(props) => (props.small ? "auto" : "400px")};
   width: ${(props) => (props.small ? "400px" : "900px")};
-  background: #fff;
+  background: ${(props) => props.bg} !important;
   border-radius: 10px;
   padding: 20px;
   display: ${(props) => (props.show ? "block" : "none")};
@@ -64,7 +64,12 @@ const DialogBodyContainer = styled.div`
   `}
 `;
 export function DialogHeader({ children }) {
-  return <DialogHeaderContainer>{children}</DialogHeaderContainer>;
+  const theme = useTheme();
+  return (
+    <DialogHeaderContainer style={{ color: theme.textColor }}>
+      {children}
+    </DialogHeaderContainer>
+  );
 }
 export function DialogBody({ children, ...rest }) {
   return <DialogBodyContainer {...rest}>{children}</DialogBodyContainer>;
@@ -74,16 +79,11 @@ export function Dialog({ children, show, title, onClose, small, ...rest }) {
   return (
     <>
       {show && <Backdrop onClick={onClose} />}
-      <DialogBoxContainer
-        style={{ background: `${theme.mainBg} !important` }}
-        show={show}
-        small={small}
-        {...rest}
-      >
+      <DialogBoxContainer bg={theme.mainBg} show={show} small={small} {...rest}>
         <DialogHeader>
           <div>{title}</div>
           <div style={{ cursor: "pointer" }} onClick={onClose}>
-            <X color="black" size={20} />
+            <X color={theme.textColor} size={20} />
           </div>
         </DialogHeader>
         <DialogBody>{children}</DialogBody>
