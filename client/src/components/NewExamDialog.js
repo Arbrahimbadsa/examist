@@ -100,7 +100,7 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     dispatcher(setQuestions(s));
     dispatcher(setExamPrefix("Quick Exam"));
     dispatcher(setQuickExamCount());
-    navigate("quick-exams/" + examId); // show fake route
+    //navigate("quick-exams/" + examId); // show fake route
 
     dispatcher(setIsGeneratingQuestion(false)); // hide loader
     clearInputs(); // clear all inputs after the exam is created
@@ -150,7 +150,7 @@ export default function NewExamDialog({ show, onClose, setNewExam }) {
     dispatcher(setQuestions(s));
     dispatcher(setExamPrefix("Custom Exam"));
     dispatcher(setCustomExamCount());
-    navigate("quick-exams/" + examId); // show fake route
+    //navigate("quick-exams/" + examId); // show fake route
 
     dispatcher(setIsGeneratingQuestion(false)); // hide loader
     clearInputs(); // clear all inputs after the exam is created
