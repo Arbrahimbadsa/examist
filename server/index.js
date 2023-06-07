@@ -17,7 +17,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: ["https://flameyourskill.vercel.app", "https://flame.arbizen.com"],
   },
 });
 
@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 // apply cors
 app.use(
   cors({
-    origin: "https://flameyourskill.vercel.app",
+    origin: "https://flameyourskill.vercel.app", "https://flame.arbizen.com"],
   })
 );
 
