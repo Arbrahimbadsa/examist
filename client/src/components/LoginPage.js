@@ -193,7 +193,6 @@ export default function LoginPage() {
             <Button type="submit">
               {isSubmitting ? "Logging..." : "Login"}
             </Button>
-            <Button onClick={handleTest}>Test</Button>
             <Link to="/register">
               <GreyText>Click here to register.</GreyText>
             </Link>
