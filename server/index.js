@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 // apply cors
 app.use(
   cors({
-    origin: "https://flameyourskill.vercel.app", "https://flame.arbizen.com"],
+    origin: ["https://flameyourskill.vercel.app", "https://flame.arbizen.com"],
   })
 );
 
